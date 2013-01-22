@@ -1,4 +1,4 @@
-package com.github.derwisch.itemMail;
+package com.github.derwisch.paperMail;
 
 
 import org.bukkit.ChatColor;
@@ -19,7 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
  
-public class ItemMailListener implements Listener {
+public class PaperMailListener implements Listener {
 	
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
@@ -35,7 +35,7 @@ public class ItemMailListener implements Listener {
         ItemStack itemInHand = player.getItemInHand();
         ItemMeta inHandMeta = itemInHand.getItemMeta();
         if (itemInHand != null && itemInHand.getType() == Material.PAPER && inHandMeta.getDisplayName().equals((ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET))) {
-        	new ItemMailGUI(player, true).Show();
+        	new PaperMailGUI(player, true).Show();
         }
         
         Block clickedBlock = event.getClickedBlock(); 
@@ -43,7 +43,7 @@ public class ItemMailListener implements Listener {
             Sign s = (Sign)event.getClickedBlock().getState();
             if(s.getLine(1).toLowerCase().contains("[mailbox]")) {
                 if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                	new ItemMailGUI(player).Show();
+                	new PaperMailGUI(player).Show();
                 } else if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 	Inbox inbox = Inbox.GetInbox(player);
                 	inbox.openInbox();
@@ -55,18 +55,18 @@ public class ItemMailListener implements Listener {
     
     @EventHandler
     public void onInventoryClick_MailGUI_Send(InventoryClickEvent event) {
-    	if (event.getInventory().getName() != ItemMail.NEW_MAIL_GUI_TITLE)
+    	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
     	
     	Inventory inventory = event.getInventory();
-    	ItemMailGUI itemMailGUI = ItemMailGUI.GetGUIfromPlayer((Player)inventory.getHolder());
+    	PaperMailGUI itemMailGUI = PaperMailGUI.GetGUIfromPlayer((Player)inventory.getHolder());
     	ItemStack currentItem = event.getCurrentItem();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
 
     	ItemStack recipientItem = inventory.getItem(0);
     	boolean writtenBookBoolean = (recipientItem != null && recipientItem.getType() == Material.WRITTEN_BOOK);
     	
-    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == ItemMailGUI.SEND_BUTTON_ON_TITLE) {
+    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE) {
     		if (!writtenBookBoolean) {
     			((Player)inventory.getHolder()).sendMessage(ChatColor.RED + "No recipient defined" + ChatColor.RESET);
 	    		event.setCancelled(true);
@@ -81,15 +81,15 @@ public class ItemMailListener implements Listener {
     
     @EventHandler
     public void onInventoryClick_MailGUI_Cancel(InventoryClickEvent event) {
-    	if (event.getInventory().getName() != ItemMail.NEW_MAIL_GUI_TITLE)
+    	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
     	
     	Inventory inventory = event.getInventory();
-    	ItemMailGUI itemMailGUI = ItemMailGUI.GetGUIfromPlayer((Player)inventory.getHolder());
+    	PaperMailGUI itemMailGUI = PaperMailGUI.GetGUIfromPlayer((Player)inventory.getHolder());
     	ItemStack currentItem = event.getCurrentItem();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
 
-    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == ItemMailGUI.CANCEL_BUTTON_TITLE) {
+    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.CANCEL_BUTTON_TITLE) {
     		itemMailGUI.Result = SendingGUIClickResult.CANCEL;
     		itemMailGUI.close();
     		event.setCancelled(true);
@@ -98,15 +98,15 @@ public class ItemMailListener implements Listener {
     
     @EventHandler
     public void onInventoryClick_MailGUI_Enderchest(InventoryClickEvent event) {
-    	if (event.getInventory().getName() != ItemMail.NEW_MAIL_GUI_TITLE)
+    	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
     	
     	ItemStack currentItem = event.getCurrentItem();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
     	
-    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == ItemMailGUI.ENDERCHEST_BUTTON_TITLE) {
+    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.ENDERCHEST_BUTTON_TITLE) {
     		Player player = (Player)event.getInventory().getHolder();
-    		ItemMailGUI itemMailGUI = ItemMailGUI.GetGUIfromPlayer(player);
+    		PaperMailGUI itemMailGUI = PaperMailGUI.GetGUIfromPlayer(player);
     		itemMailGUI.Result = SendingGUIClickResult.OPEN_ENDERCHEST;
     		event.setCancelled(true);
     		OpenInventory(player, player.getEnderChest());
@@ -116,12 +116,12 @@ public class ItemMailListener implements Listener {
     private static Player player = null;
     private static Inventory inventory = null;    
     public static void OpenInventory(Player player, Inventory inventory) {
-    	ItemMailListener.player = player;
-    	ItemMailListener.inventory = inventory;
-    	ItemMail.server.getScheduler().scheduleSyncDelayedTask(ItemMail.instance, new Runnable() {
+    	PaperMailListener.player = player;
+    	PaperMailListener.inventory = inventory;
+    	PaperMail.server.getScheduler().scheduleSyncDelayedTask(PaperMail.instance, new Runnable() {
     		@Override 
     	    public void run() {
-    	    	openInventory(ItemMailListener.player, ItemMailListener.inventory);
+    	    	openInventory(PaperMailListener.player, PaperMailListener.inventory);
     	    }
     	}, 0L);
     }
@@ -133,14 +133,14 @@ public class ItemMailListener implements Listener {
     
     @EventHandler
     public void onInventoryClick_MailGUI_Recipient(InventoryClickEvent event) {
-    	if (event.getInventory().getName() != ItemMail.NEW_MAIL_GUI_TITLE)
+    	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
     	
     	ItemStack currentItem = event.getCurrentItem();
     	ItemStack cursorItem = event.getCursor();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
 
-    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == ItemMailGUI.RECIPIENT_TITLE) {
+    	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE) {
     		if (cursorItem.getType() == Material.WRITTEN_BOOK) {
 	    		event.setCurrentItem(cursorItem);
 	    		event.setCursor(null);
@@ -155,9 +155,9 @@ public class ItemMailListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
     	Inventory inventory = event.getInventory();
     	
-    	if (inventory.getName() == ItemMail.NEW_MAIL_GUI_TITLE) {
+    	if (inventory.getName() == PaperMail.NEW_MAIL_GUI_TITLE) {
     		Player player = ((Player)inventory.getHolder()); 
-    		ItemMailGUI gui = ItemMailGUI.GetGUIfromPlayer(player);
+    		PaperMailGUI gui = PaperMailGUI.GetGUIfromPlayer(player);
     		World world = player.getWorld();
     		Location playerLocation = player.getLocation();
     		if (gui.Result == SendingGUIClickResult.CANCEL) {
@@ -170,10 +170,10 @@ public class ItemMailListener implements Listener {
 		    			
 		    			ItemMeta itemMeta = itemStack.getItemMeta();
 		    			if (itemMeta != null &&
-		    					(itemMeta.getDisplayName() == ItemMailGUI.CANCEL_BUTTON_TITLE ||
-		    					itemMeta.getDisplayName() == ItemMailGUI.ENDERCHEST_BUTTON_TITLE ||
-		    					itemMeta.getDisplayName() == ItemMailGUI.RECIPIENT_TITLE ||
-		    					itemMeta.getDisplayName() == ItemMailGUI.SEND_BUTTON_ON_TITLE)) {
+		    					(itemMeta.getDisplayName() == PaperMailGUI.CANCEL_BUTTON_TITLE ||
+		    					itemMeta.getDisplayName() == PaperMailGUI.ENDERCHEST_BUTTON_TITLE ||
+		    					itemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE ||
+		    					itemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE)) {
 		    				continue;
 		    			}
 		    			world.dropItemNaturally(playerLocation, itemStack);    			
@@ -183,7 +183,7 @@ public class ItemMailListener implements Listener {
     		
     	}
 
-    	if (inventory.getName() == ItemMail.INBOX_GUI_TITLE) {
+    	if (inventory.getName() == PaperMail.INBOX_GUI_TITLE) {
     		Player player = ((Player)inventory.getHolder());
     		Inbox inbox = Inbox.GetInbox(player);
     		inbox.SaveInbox();
@@ -192,7 +192,7 @@ public class ItemMailListener implements Listener {
     	
     	if (inventory.getType().toString() == "ENDER_CHEST") {
         	Player player = (Player)event.getPlayer();
-        	ItemMailGUI gui = ItemMailGUI.GetOpenGUI(player);
+        	PaperMailGUI gui = PaperMailGUI.GetOpenGUI(player);
         	if (gui != null) {
         		OpenInventory(player, gui.Inventory);
         		gui.Result = SendingGUIClickResult.CANCEL;

@@ -1,4 +1,4 @@
-package com.github.derwisch.itemMail;
+package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,15 +14,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class ItemMailGUI {
+public class PaperMailGUI {
 
 	public static final String RECIPIENT_TITLE = ChatColor.RED + "Recipient" + ChatColor.RESET;
 	public static final String SEND_BUTTON_ON_TITLE = ChatColor.WHITE + "Send" + ChatColor.RESET;
 	public static final String CANCEL_BUTTON_TITLE = ChatColor.WHITE + "Cancel" + ChatColor.RESET;
 	public static final String ENDERCHEST_BUTTON_TITLE = ChatColor.WHITE + "Open Enderchest" + ChatColor.RESET;
 	
-	private static ArrayList<ItemMailGUI> itemMailGUIs = new ArrayList<ItemMailGUI>();
-	private static Map<Player, ItemMailGUI> openGUIs = new HashMap<Player, ItemMailGUI>();
+	private static ArrayList<PaperMailGUI> itemMailGUIs = new ArrayList<PaperMailGUI>();
+	private static Map<Player, PaperMailGUI> openGUIs = new HashMap<Player, PaperMailGUI>();
 	
 	public Inventory Inventory;
 	public Player Player;
@@ -35,22 +35,22 @@ public class ItemMailGUI {
 	
 	public SendingGUIClickResult Result = SendingGUIClickResult.CANCEL;
 	
-	public static ItemMailGUI GetOpenGUI(Player player) {
+	public static PaperMailGUI GetOpenGUI(Player player) {
 		return openGUIs.get(player);
 	}
 	
-	public ItemMailGUI(Player player) {
+	public PaperMailGUI(Player player) {
 		this.paperSent = false;
 		Player = player;
-		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, ItemMail.NEW_MAIL_GUI_TITLE);
+		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
 		initializeButtons();
     	itemMailGUIs.add(this);
 	}
 
-	public ItemMailGUI(Player player, boolean paperSent) {
+	public PaperMailGUI(Player player, boolean paperSent) {
 		this.paperSent = paperSent;
 		Player = player;
-		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, ItemMail.NEW_MAIL_GUI_TITLE);
+		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
 		initializeButtons();
     	itemMailGUIs.add(this);
 	}
@@ -149,9 +149,9 @@ public class ItemMailGUI {
 			}
 		}
 		
-		Player player_ = ItemMail.server.getPlayer(playerName);
+		Player player_ = PaperMail.server.getPlayer(playerName);
 		if (player_ == null) {
-			OfflinePlayer offlinePlayer = ItemMail.server.getOfflinePlayer(playerName);
+			OfflinePlayer offlinePlayer = PaperMail.server.getOfflinePlayer(playerName);
 			if (offlinePlayer != null) {
 				player_ = offlinePlayer.getPlayer();
 			} else {
@@ -171,8 +171,8 @@ public class ItemMailGUI {
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message to " + player_.getDisplayName() + " sent!" + ChatColor.RESET);
 	}
 	
-	public static ItemMailGUI GetGUIfromPlayer(Player player) {
-		for (ItemMailGUI gui : itemMailGUIs) {
+	public static PaperMailGUI GetGUIfromPlayer(Player player) {
+		for (PaperMailGUI gui : itemMailGUIs) {
 			if (gui.Player == player)
 				return gui;
 		}

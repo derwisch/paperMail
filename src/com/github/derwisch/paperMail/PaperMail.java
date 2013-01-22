@@ -1,4 +1,4 @@
-package com.github.derwisch.itemMail;
+package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -14,16 +14,16 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class ItemMail extends JavaPlugin {
+public class PaperMail extends JavaPlugin {
 	  
-	public static final String NEW_MAIL_GUI_TITLE = ChatColor.BLACK + "ItemMail: New Mail" + ChatColor.RESET;
-	public static final String INBOX_GUI_TITLE = ChatColor.BLACK + "ItemMail: Inbox" + ChatColor.RESET;
+	public static final String NEW_MAIL_GUI_TITLE = ChatColor.BLACK + "PaperMail: New Mail" + ChatColor.RESET;
+	public static final String INBOX_GUI_TITLE = ChatColor.BLACK + "PaperMail: Inbox" + ChatColor.RESET;
 	
-	public static ItemMail instance;
+	public static PaperMail instance;
 	public static Server server;
 	public static Logger logger;
 	
-	private ItemMailListener listener;
+	private PaperMailListener listener;
 	private FileConfiguration configuration;
 	
     @Override
@@ -34,12 +34,12 @@ public class ItemMail extends JavaPlugin {
     	
     	saveDefaultConfig();
     	configuration = this.getConfig();
-    	Settings.loadConfiguration(configuration);
+    	Settings.LoadConfiguration(configuration);
     	
-    	ItemMailCommandExecutor commandExecutor = new ItemMailCommandExecutor(this); 
+    	PaperMailCommandExecutor commandExecutor = new PaperMailCommandExecutor(this); 
     	getCommand("itemmail").setExecutor(commandExecutor);
     	
-    	listener = new ItemMailListener();
+    	listener = new PaperMailListener();
         this.getServer().getPluginManager().registerEvents(listener, this);
         
         initializeRecipes();
@@ -50,9 +50,7 @@ public class ItemMail extends JavaPlugin {
     
 	@Override
     public void onDisable() {
-		
-		
-		
+		Settings.SaveConfiguration(configuration);
     	getLogger().info("Disabled ItemMail");
     }
     

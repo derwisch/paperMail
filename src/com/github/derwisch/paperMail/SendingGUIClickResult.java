@@ -1,4 +1,4 @@
-package com.github.derwisch.itemMail;
+package com.github.derwisch.paperMail;
 
 public enum SendingGUIClickResult {
     /**

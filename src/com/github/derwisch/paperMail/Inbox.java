@@ -1,4 +1,4 @@
-package com.github.derwisch.itemMail;
+package com.github.derwisch.paperMail;
 
 
 import java.util.ArrayList;
@@ -57,9 +57,9 @@ public class Inbox {
 	
 	public Inbox(Player player) {
 		this.player = player;
-		this.configAccessor = new ConfigAccessor(ItemMail.instance, "players\\" + player.getDisplayName() + ".yml");
+		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + player.getDisplayName() + ".yml");
 		this.playerConfig = configAccessor.getConfig();
-		this.inventory = Bukkit.createInventory(player, 36, ItemMail.INBOX_GUI_TITLE);
+		this.inventory = Bukkit.createInventory(player, 36, PaperMail.INBOX_GUI_TITLE);
 		configAccessor.saveConfig();
 		
 		loadChest();

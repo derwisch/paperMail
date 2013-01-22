@@ -1,4 +1,4 @@
-package com.github.derwisch.itemMail;
+package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
 
@@ -13,11 +13,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class ItemMailCommandExecutor implements CommandExecutor {
+public class PaperMailCommandExecutor implements CommandExecutor {
     
-	private ItemMail plugin;
+	private PaperMail plugin;
  
-	public ItemMailCommandExecutor(ItemMail plugin) {
+	public PaperMailCommandExecutor(PaperMail plugin) {
 		this.plugin = plugin;
 		this.plugin.getLogger().info("ItemMailCommandExecutor initialized");
 	}
@@ -35,7 +35,7 @@ public class ItemMailCommandExecutor implements CommandExecutor {
 				return true;
 			} else {
 				if (args.length == 0) {
-					sender.sendMessage("Current Version of ItemMail is " + ItemMail.instance.getDescription().getVersion());
+					sender.sendMessage("Current Version of ItemMail is " + PaperMail.instance.getDescription().getVersion());
 					return true;
 				}
 				
@@ -57,9 +57,9 @@ public class ItemMailCommandExecutor implements CommandExecutor {
 						return true;
 					}
 					
-					Player recipient = ItemMail.server.getPlayer(args[1]);
+					Player recipient = PaperMail.server.getPlayer(args[1]);
 					if (recipient == null) {
-						recipient = ItemMail.server.getOfflinePlayer(args[1]).getPlayer();
+						recipient = PaperMail.server.getOfflinePlayer(args[1]).getPlayer();
 						if (recipient == null) {
 							player.sendMessage(ChatColor.DARK_RED + "Player not found" + ChatColor.RESET);
 							return true;
@@ -108,9 +108,9 @@ public class ItemMailCommandExecutor implements CommandExecutor {
 					
 					if (block != null && block.getType() == Material.CHEST) {
 
-						Player recipient = ItemMail.server.getPlayer(args[1]);
+						Player recipient = PaperMail.server.getPlayer(args[1]);
 						if (recipient == null) {
-							recipient = ItemMail.server.getOfflinePlayer(args[1]).getPlayer();
+							recipient = PaperMail.server.getOfflinePlayer(args[1]).getPlayer();
 							if (recipient == null) {
 								player.sendMessage(ChatColor.DARK_RED + "Player not found" + ChatColor.RESET);
 								return true;
