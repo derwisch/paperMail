@@ -1,0 +1,25 @@
+name: PaperMail
+main: com.github.derwisch.paperMail.PaperMail
+version: 1.0.0.2
+      
+commands:
+   papermail:
+      usage: /papermail <sendtext|createbox>
+      aliases: [pm]
+      
+permissions:
+    papermail.*:
+        description: Gives access to all PaperMail functionallity
+        children:
+            papermail.send.text: true
+            papermail.send.item.box: true
+            papermail.createchest: true
+    papermail.send.text:
+        description: Allows to send textmails
+        default: true
+    papermail.send.item:
+        description: Allows to send papermails via a mailbox
+        default: true
+    papermail.createchest:
+        description: Allows to create mailbox chests
+        default: true

@@ -23,9 +23,9 @@ public class PaperMailListener implements Listener {
 	
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
-		Inbox inbox = Inbox.GetInbox(event.getPlayer());
+		Inbox inbox = Inbox.GetInbox(event.getPlayer().getDisplayName());
 		if (inbox == null) {
-			Inbox.AddInbox(event.getPlayer());
+			Inbox.AddInbox(event.getPlayer().getDisplayName());
 		}
     }
     
@@ -34,7 +34,7 @@ public class PaperMailListener implements Listener {
         Player player = event.getPlayer();
         ItemStack itemInHand = player.getItemInHand();
         ItemMeta inHandMeta = itemInHand.getItemMeta();
-        if (itemInHand != null && itemInHand.getType() == Material.PAPER && inHandMeta.getDisplayName().equals((ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET))) {
+        if (itemInHand != null && itemInHand.getType() == Material.PAPER && inHandMeta.getDisplayName().equals((ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET)) && player.hasPermission(Permissions.SEND_ITEM_PERM)) {
         	new PaperMailGUI(player, true).Show();
         }
         
@@ -45,7 +45,7 @@ public class PaperMailListener implements Listener {
                 if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 	new PaperMailGUI(player).Show();
                 } else if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                	Inbox inbox = Inbox.GetInbox(player);
+                	Inbox inbox = Inbox.GetInbox(player.getDisplayName());
                 	inbox.openInbox();
                 	event.setCancelled(true);
                 }
@@ -185,7 +185,7 @@ public class PaperMailListener implements Listener {
 
     	if (inventory.getName() == PaperMail.INBOX_GUI_TITLE) {
     		Player player = ((Player)inventory.getHolder());
-    		Inbox inbox = Inbox.GetInbox(player);
+    		Inbox inbox = Inbox.GetInbox(player.getDisplayName());
     		inbox.SaveInbox();
     	}
     	

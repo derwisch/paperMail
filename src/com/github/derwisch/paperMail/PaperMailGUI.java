@@ -7,7 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+//import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -149,6 +149,7 @@ public class PaperMailGUI {
 			}
 		}
 		
+		/*
 		Player player_ = PaperMail.server.getPlayer(playerName);
 		if (player_ == null) {
 			OfflinePlayer offlinePlayer = PaperMail.server.getOfflinePlayer(playerName);
@@ -159,8 +160,9 @@ public class PaperMailGUI {
 				return;
 			}
 		}
+		//*/
 		
-		Inbox inbox = Inbox.GetInbox(player_);
+		Inbox inbox = Inbox.GetInbox(playerName);
 		inbox.AddItems(sendingContents, Player);
 		
 		if (paperSent) {
@@ -168,7 +170,7 @@ public class PaperMailGUI {
 			itemInHand.setAmount(itemInHand.getAmount() - 1);
 		}
 		
-		Player.sendMessage(ChatColor.DARK_GREEN + "Message to " + player_.getDisplayName() + " sent!" + ChatColor.RESET);
+		Player.sendMessage(ChatColor.DARK_GREEN + "Message to " + playerName + " sent!" + ChatColor.RESET);
 	}
 	
 	public static PaperMailGUI GetGUIfromPlayer(Player player) {

@@ -23,15 +23,10 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	}
  
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		//System.out.println("Label: " + label);
-		//for (String arg : args) {
-		//	System.out.println("Argument: " + arg);
-		//}
-		
-		if (cmd.getName().equalsIgnoreCase("itemmail")){
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {		
+		if (cmd.getName().equalsIgnoreCase("papermail")){
 			if (!(sender instanceof Player) && args.length > 0) {
-				sender.sendMessage("This command can only be run by a player.");
+				sender.sendMessage("Current Version of ItemMail is " + PaperMail.instance.getDescription().getVersion());
 				return true;
 			} else {
 				if (args.length == 0) {
@@ -47,7 +42,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					return true;
 				}
 
-				if (Settings.EnableTextMail && args[0].toLowerCase().equals("sendtext")) {
+				if (Settings.EnableTextMail && args[0].toLowerCase().equals("sendtext") && player.hasPermission(Permissions.SEND_TEXT_PERM)) {
 					if (args.length < 3) {
 						if (args.length < 2) {
 							player.sendMessage(ChatColor.DARK_RED + "Missing arguments for textmail!" + ChatColor.RESET);
@@ -55,15 +50,6 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						}
 						player.sendMessage(ChatColor.DARK_RED + "Missing text of textmail!" + ChatColor.RESET);
 						return true;
-					}
-					
-					Player recipient = PaperMail.server.getPlayer(args[1]);
-					if (recipient == null) {
-						recipient = PaperMail.server.getOfflinePlayer(args[1]).getPlayer();
-						if (recipient == null) {
-							player.sendMessage(ChatColor.DARK_RED + "Player not found" + ChatColor.RESET);
-							return true;
-						}
 					}
 					
 					ItemStack itemStack = new ItemStack(Material.PAPER);
@@ -92,13 +78,13 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					itemMeta.setLore(lines);
 					itemStack.setItemMeta(itemMeta);
 					
-					Inbox.GetInbox(recipient).AddItem(itemStack, player);
+					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
 
-					System.out.println("Textmail sent to "  + recipient.getDisplayName());
+					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					return true;
 				}
 
-				if (args[0].toLowerCase().equals("createbox")) {
+				if (args[0].toLowerCase().equals("createbox") && player.hasPermission(Permissions.CREATE_CHEST_PERM)) {
 					if (args.length < 2) {
 						player.sendMessage(ChatColor.DARK_RED + "No player defined!" + ChatColor.RESET);
 						return true;
@@ -108,17 +94,9 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					
 					if (block != null && block.getType() == Material.CHEST) {
 
-						Player recipient = PaperMail.server.getPlayer(args[1]);
-						if (recipient == null) {
-							recipient = PaperMail.server.getOfflinePlayer(args[1]).getPlayer();
-							if (recipient == null) {
-								player.sendMessage(ChatColor.DARK_RED + "Player not found" + ChatColor.RESET);
-								return true;
-							}
-						}
 						
 						Chest chest = (Chest)block.getState();
-						Inbox inbox = Inbox.GetInbox(recipient);
+						Inbox inbox = Inbox.GetInbox(args[1]);
 						
 						inbox.inboxChest = chest;
 						player.sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
@@ -130,10 +108,8 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					
 				}
 			}
-			System.out.println("End with unknown reason");
 			return true;
 		}
-		System.out.println("Non matching command");
 		return false;
 	}
 }

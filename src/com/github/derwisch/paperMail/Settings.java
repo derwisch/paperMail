@@ -1,5 +1,8 @@
 package com.github.derwisch.paperMail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.configuration.Configuration;
 
 public class Settings {
@@ -23,6 +26,8 @@ public class Settings {
 	public static String Inbox_Full_Send_Message = "The mailbox of {0} is full, the items have been sent back to you.";
 	public static String Item_Missing_Message = "You are missing {0} to create a new letter.";
 	
+	public static List<String> InboxPlayers = new ArrayList<String>();
+	
     public static void LoadConfiguration(Configuration config) {
         try {
         	DefaultBoxRows = Math.max(3, config.getInt("general.DefaultBoxRows"));
@@ -43,6 +48,7 @@ public class Settings {
         	Inbox_Full_Send_Message = config.getString("messages.inbox-full-send");
         	Item_Missing_Message = config.getString("messages.ingredient-missing");
         	
+        	InboxPlayers = config.getStringList("inboxPlayers");
         } catch (Exception e) {
                 e.printStackTrace();
         }
@@ -65,6 +71,8 @@ public class Settings {
     	
     	config.set("messages.inbox-full-send", Inbox_Full_Send_Message);
     	config.set("messages.ingredient-missing", Item_Missing_Message);
+    	
+    	config.set("inboxPlayers", InboxPlayers);
     }
     
 }

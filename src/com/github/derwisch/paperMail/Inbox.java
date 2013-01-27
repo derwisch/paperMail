@@ -25,45 +25,53 @@ public class Inbox {
 		}
 	}
 	
-	public static Inbox GetInbox(Player player) {
+	public static Inbox GetInbox(String playerName) {
 		for (Inbox inbox : Inboxes) {
-			if (inbox.player.equals(player)) {
+			if (inbox.playerName.equals(playerName)) {
 				return inbox;
 			}
 		}
-		AddInbox(player);
-		return GetInbox(player);
+		AddInbox(playerName);
+		return GetInbox(playerName);
 	}
 	
-	public static void AddInbox(Player player) {
-		Inbox inbox = new Inbox(player);
+	public static void AddInbox(String playerName) {
+		if (!Settings.InboxPlayers.contains(playerName)) {
+			Settings.InboxPlayers.add(playerName);
+		}
+		Inbox inbox = new Inbox(playerName);
 		Inboxes.add(inbox);
 	}
 	
-	public static void RemoveInbox(Player player) {
+	public static void RemoveInbox(String playerName) {
 		for (Inbox inbox : Inboxes) {
-			if (inbox.player.equals(player)) {
+			if (inbox.playerName.equals(playerName)) {
 				Inboxes.remove(inbox);
 			}
 		}
 	}
 	
-	public Player player;
+	public String playerName;
 	public Inventory inventory;
 	public Chest inboxChest;
 	
 	private FileConfiguration playerConfig;
 	private ConfigAccessor configAccessor;
 	
-	public Inbox(Player player) {
-		this.player = player;
-		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + player.getDisplayName() + ".yml");
+	public Inbox(String playerName) {
+		this.playerName = playerName;
+		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + playerName + ".yml");
 		this.playerConfig = configAccessor.getConfig();
-		this.inventory = Bukkit.createInventory(player, 36, PaperMail.INBOX_GUI_TITLE);
 		configAccessor.saveConfig();
 		
+		initMailBox();
 		loadChest();
 		loadItems();
+	}
+	
+	private void initMailBox() {
+		Player player = Bukkit.getServer().getPlayer(playerName);
+		this.inventory = Bukkit.createInventory(player, 36, PaperMail.INBOX_GUI_TITLE);
 	}
 	
 	private void loadChest() {
@@ -93,6 +101,9 @@ public class Inbox {
 		 playerConfig.set("chest.x", x);
 		 playerConfig.set("chest.y", y);
 		 playerConfig.set("chest.z", z);
+
+
+		configAccessor.saveConfig();
 	}
 	
 	private void loadItems() {
@@ -118,10 +129,13 @@ public class Inbox {
 	}
 	
 	public void openInbox() {
+		Player player = Bukkit.getServer().getPlayer(playerName);
+		
 		player.openInventory(inventory);
 	}
 	
 	public void AddItem(ItemStack itemStack, Player sender) {
+		Player player = Bukkit.getServer().getPlayer(playerName);
 		if (inboxChest != null) {
 			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
 				if (inventory.addItem(itemStack).keySet().toArray().length > 0) {

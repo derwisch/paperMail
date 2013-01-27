@@ -37,7 +37,7 @@ public class PaperMail extends JavaPlugin {
     	Settings.LoadConfiguration(configuration);
     	
     	PaperMailCommandExecutor commandExecutor = new PaperMailCommandExecutor(this); 
-    	getCommand("itemmail").setExecutor(commandExecutor);
+    	getCommand("papermail").setExecutor(commandExecutor);
     	
     	listener = new PaperMailListener();
         this.getServer().getPluginManager().registerEvents(listener, this);
@@ -45,13 +45,14 @@ public class PaperMail extends JavaPlugin {
         initializeRecipes();
         initializeInboxes();
         
-    	logger.info("Enabled ItemMail");
+    	logger.info("Enabled PaperMail");
     }
     
 	@Override
     public void onDisable() {
 		Settings.SaveConfiguration(configuration);
-    	getLogger().info("Disabled ItemMail");
+		Inbox.SaveAll();
+    	getLogger().info("Disabled PaperMail");
     }
     
     private void initializeRecipes() {
@@ -76,7 +77,7 @@ public class PaperMail extends JavaPlugin {
 			if (player == null) {
 				continue;
 			}
-			Inbox.AddInbox(player);
+			Inbox.AddInbox(player.getDisplayName());
 		}
 		for (OfflinePlayer offPlayer : getServer().getOfflinePlayers()) {
 			
@@ -85,8 +86,8 @@ public class PaperMail extends JavaPlugin {
 			if (player == null) {
 				continue;
 			}
-			Inbox.AddInbox(player);
-		}	
+			Inbox.AddInbox(player.getDisplayName());
+		}
 	}
     
     
