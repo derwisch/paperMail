@@ -22,7 +22,7 @@ public class PaperMailGUI {
 	public static final String ENDERCHEST_BUTTON_TITLE = ChatColor.WHITE + "Open Enderchest" + ChatColor.RESET;
 	
 	private static ArrayList<PaperMailGUI> itemMailGUIs = new ArrayList<PaperMailGUI>();
-	private static Map<Player, PaperMailGUI> openGUIs = new HashMap<Player, PaperMailGUI>();
+	private static Map<String, PaperMailGUI> openGUIs = new HashMap<String, PaperMailGUI>();
 	
 	public Inventory Inventory;
 	public Player Player;
@@ -35,8 +35,13 @@ public class PaperMailGUI {
 	
 	public SendingGUIClickResult Result = SendingGUIClickResult.CANCEL;
 	
-	public static PaperMailGUI GetOpenGUI(Player player) {
-		return openGUIs.get(player);
+	public static void RemoveGUI(String playerName) {
+		openGUIs.put(playerName, null);
+		openGUIs.remove(playerName);
+	}
+	
+	public static PaperMailGUI GetOpenGUI(String playerName) {
+		return openGUIs.get(playerName);
 	}
 	
 	public PaperMailGUI(Player player) {
@@ -81,8 +86,7 @@ public class PaperMailGUI {
     	sendButtonDisabledLore.add(ChatColor.GRAY + "sending" + ChatColor.RESET);
 
     	enderChestButtonLore.add(ChatColor.GRAY + "Grants access to your" + ChatColor.RESET);
-    	enderChestButtonLore.add(ChatColor.GRAY + "enderchest but uses" + ChatColor.RESET);
-    	enderChestButtonLore.add(ChatColor.GRAY + "one enderpearl per to open." + ChatColor.RESET);
+    	enderChestButtonLore.add(ChatColor.GRAY + "enderchest." + ChatColor.RESET);
     	enderChestButtonLore.add(ChatColor.GRAY + "You return to the mail after" + ChatColor.RESET);
     	enderChestButtonLore.add(ChatColor.GRAY + "closing the enderchest" + ChatColor.RESET);
     	
@@ -112,13 +116,13 @@ public class PaperMailGUI {
 	public void Show() {
 		if (Settings.EnableItemMail) {
 			Player.openInventory(Inventory);
-			openGUIs.put(Player, this);
+			openGUIs.put(Player.getDisplayName(), this);
 		}
 	}
 	
 	public void SetClosed() {
-		openGUIs.put(Player, null);
-		openGUIs.remove(Player);
+		RemoveGUI(Player.getDisplayName());
+		itemMailGUIs.remove(this);
 	}
 		
 	public void close() {
@@ -149,28 +153,16 @@ public class PaperMailGUI {
 			}
 		}
 		
-		/*
-		Player player_ = PaperMail.server.getPlayer(playerName);
-		if (player_ == null) {
-			OfflinePlayer offlinePlayer = PaperMail.server.getOfflinePlayer(playerName);
-			if (offlinePlayer != null) {
-				player_ = offlinePlayer.getPlayer();
-			} else {
-				Player.sendMessage(ChatColor.RED + "This player does not exist." + ChatColor.RESET);
-				return;
-			}
-		}
-		//*/
-		
 		Inbox inbox = Inbox.GetInbox(playerName);
 		inbox.AddItems(sendingContents, Player);
 		
 		if (paperSent) {
 			ItemStack itemInHand = Player.getInventory().getItemInHand();
 			itemInHand.setAmount(itemInHand.getAmount() - 1);
+			Player.setItemInHand(itemInHand);
 		}
 		
-		Player.sendMessage(ChatColor.DARK_GREEN + "Message to " + playerName + " sent!" + ChatColor.RESET);
+		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);
 	}
 	
 	public static PaperMailGUI GetGUIfromPlayer(Player player) {

@@ -50,19 +50,21 @@ public class PaperMail extends JavaPlugin {
     
 	@Override
     public void onDisable() {
-		Settings.SaveConfiguration(configuration);
 		Inbox.SaveAll();
+		Settings.SaveConfiguration(configuration);
+		this.saveConfig();
     	getLogger().info("Disabled PaperMail");
     }
     
     private void initializeRecipes() {
-		ItemStack letterPaper = new ItemStack(Material.PAPER);
+		ItemStack letterPaper = new ItemStack(Material.getMaterial(Settings.MailItemID));
 		ItemMeta letterPaperMeta = letterPaper.getItemMeta();
 		ArrayList<String> letterPaperLore = new ArrayList<String>();
 		letterPaperMeta.setDisplayName(ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET);
 		letterPaperLore.add(ChatColor.GRAY + "Used to send a letter" + ChatColor.RESET);
 		letterPaperMeta.setLore(letterPaperLore);
     	letterPaper.setItemMeta(letterPaperMeta);
+    	letterPaper.setDurability((short)Settings.MailItemDV);
 		
 		ShapelessRecipe letterPaperRecipe = new ShapelessRecipe(letterPaper);
 		letterPaperRecipe.addIngredient(Material.PAPER);

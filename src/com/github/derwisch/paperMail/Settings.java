@@ -22,10 +22,6 @@ public class Settings {
 	public static int MailItemDV = 1;
 	public static String MailItemName = "Letter paper";
 	
-	// Messages
-	public static String Inbox_Full_Send_Message = "The mailbox of {0} is full, the items have been sent back to you.";
-	public static String Item_Missing_Message = "You are missing {0} to create a new letter.";
-	
 	public static List<String> InboxPlayers = new ArrayList<String>();
 	
     public static void LoadConfiguration(Configuration config) {
@@ -37,16 +33,9 @@ public class Settings {
         	EnableItemMail = config.getBoolean("general.EnableItemMail");
         	EnableEnderchest = config.getBoolean("general.EnableEnderchest");
 
-        	EnderChestRequirementID = config.getInt("general.EnderChestRequirementID");
-        	EnderChestRequirementDV = config.getInt("general.EnderChestRequirementDV");
-        	
         	MailItemID = config.getInt("general.MailItemID");
         	MailItemDV = config.getInt("general.MailItemDV");
         	MailItemName = config.getString("general.MailItemName");
-        	
-
-        	Inbox_Full_Send_Message = config.getString("messages.inbox-full-send");
-        	Item_Missing_Message = config.getString("messages.ingredient-missing");
         	
         	InboxPlayers = config.getStringList("inboxPlayers");
         } catch (Exception e) {
@@ -62,16 +51,10 @@ public class Settings {
     	config.set("general.EnableItemMail", EnableItemMail);
     	config.set("general.EnableEnderchest", EnableEnderchest);
     	
-    	config.set("general.EnderChestRequirementID", EnderChestRequirementID);
-    	config.set("general.EnderChestRequirementDV", EnderChestRequirementDV);
-    	
     	config.set("general.MailItemID", MailItemID);
     	config.set("general.MailItemDV", MailItemDV);
     	config.set("general.MailItemName", MailItemName);
-    	
-    	config.set("messages.inbox-full-send", Inbox_Full_Send_Message);
-    	config.set("messages.ingredient-missing", Item_Missing_Message);
-    	
+    	    	
     	config.set("inboxPlayers", InboxPlayers);
     }
     

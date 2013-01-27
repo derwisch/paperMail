@@ -34,7 +34,7 @@ public class PaperMailListener implements Listener {
         Player player = event.getPlayer();
         ItemStack itemInHand = player.getItemInHand();
         ItemMeta inHandMeta = itemInHand.getItemMeta();
-        if (itemInHand != null && itemInHand.getType() == Material.PAPER && inHandMeta.getDisplayName().equals((ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET)) && player.hasPermission(Permissions.SEND_ITEM_PERM)) {
+        if (itemInHand != null && inHandMeta != null && itemInHand.getType() == Material.getMaterial(Settings.MailItemID) && itemInHand.getDurability() == Settings.MailItemDV && inHandMeta.getDisplayName().equals((ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET)) && player.hasPermission(Permissions.SEND_ITEM_PERM)) {
         	new PaperMailGUI(player, true).Show();
         }
         
@@ -73,8 +73,12 @@ public class PaperMailListener implements Listener {
     		} else {
     			itemMailGUI.Result = SendingGUIClickResult.SEND;
 	    		itemMailGUI.SendContents();
+	    		itemMailGUI.SetClosed();
 	    		((Player)inventory.getHolder()).closeInventory();
 	    		event.setCancelled(true);
+	    		
+	        	itemMailGUI = null;
+	        	PaperMailGUI.RemoveGUI(((Player)inventory.getHolder()).getDisplayName());
     		}
     	}
     }
@@ -192,7 +196,7 @@ public class PaperMailListener implements Listener {
     	
     	if (inventory.getType().toString() == "ENDER_CHEST") {
         	Player player = (Player)event.getPlayer();
-        	PaperMailGUI gui = PaperMailGUI.GetOpenGUI(player);
+        	PaperMailGUI gui = PaperMailGUI.GetOpenGUI(player.getDisplayName());
         	if (gui != null) {
         		OpenInventory(player, gui.Inventory);
         		gui.Result = SendingGUIClickResult.CANCEL;

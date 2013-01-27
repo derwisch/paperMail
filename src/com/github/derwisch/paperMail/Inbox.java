@@ -21,7 +21,6 @@ public class Inbox {
 	public static void SaveAll() {
 		for (Inbox inbox : Inboxes) {
 			inbox.SaveInbox();
-			
 		}
 	}
 	
@@ -86,6 +85,18 @@ public class Inbox {
 		
 		inboxChest = (block != null && block.getType() == Material.CHEST) ? (Chest)block.getState() : null; 
 	}
+	
+	private void loadItems() {
+		int i = 0;
+		ItemStack stack = null;
+		do {
+			stack = playerConfig.getItemStack("itemstack." + i);
+			if (stack != null) {
+				inventory.addItem(stack);
+			}
+			i++;
+		} while (stack != null);
+	}
 
 	private void saveChest() {
 		if (inboxChest == null) {
@@ -102,27 +113,15 @@ public class Inbox {
 		 playerConfig.set("chest.y", y);
 		 playerConfig.set("chest.z", z);
 
-
-		configAccessor.saveConfig();
-	}
-	
-	private void loadItems() {
-		int i = 0;
-		ItemStack stack = null;
-		do {
-			stack = playerConfig.getItemStack("itemstack." + i);
-			if (stack != null) {
-				inventory.addItem(stack);
-			}
-			i++;
-		} while (stack != null);
+		 configAccessor.saveConfig();
 	}
 	
 	private void saveItems() {
-		int i = 0;
-		for (ItemStack stack : inventory.getContents()) {
-			playerConfig.set("itemstack." + i, stack);
-			i++;
+		for (int i = 0; i < Settings.DefaultBoxRows * 9; i++) {
+			ItemStack stack = inventory.getItem(i);
+			if (stack != null) {
+				playerConfig.set("itemstack." + i, stack);
+			}
 		}
 		
 		configAccessor.saveConfig();
@@ -132,6 +131,11 @@ public class Inbox {
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		
 		player.openInventory(inventory);
+	}
+	
+	public void SetChest(Chest newChest) {
+		inboxChest = newChest;
+		saveChest();
 	}
 	
 	public void AddItem(ItemStack itemStack, Player sender) {

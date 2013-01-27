@@ -98,7 +98,8 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						Chest chest = (Chest)block.getState();
 						Inbox inbox = Inbox.GetInbox(args[1]);
 						
-						inbox.inboxChest = chest;
+						inbox.SetChest(chest);
+						
 						player.sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
 						return true;
 					} else {
