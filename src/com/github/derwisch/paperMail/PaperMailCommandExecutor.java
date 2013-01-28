@@ -84,9 +84,15 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					return true;
 				}
 
-				if (args[0].toLowerCase().equals("createbox") && player.hasPermission(Permissions.CREATE_CHEST_PERM)) {
-					if (args.length < 2) {
-						player.sendMessage(ChatColor.DARK_RED + "No player defined!" + ChatColor.RESET);
+				if (args[0].toLowerCase().equals("createbox")) {
+					Inbox inbox;
+					
+					if (args.length == 1 && (player.hasPermission(Permissions.CREATE_CHEST_SELF_PERM)  || player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM))) {
+						inbox = Inbox.GetInbox(player.getDisplayName());
+					} else if (args.length == 2 && player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)) {
+						inbox = Inbox.GetInbox(args[1]);
+					} else {
+						player.sendMessage(ChatColor.DARK_RED + "Too much arguments!" + ChatColor.RESET);
 						return true;
 					}
 					
@@ -96,7 +102,6 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 
 						
 						Chest chest = (Chest)block.getState();
-						Inbox inbox = Inbox.GetInbox(args[1]);
 						
 						inbox.SetChest(chest);
 						

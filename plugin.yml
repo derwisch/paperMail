@@ -1,6 +1,6 @@
 name: PaperMail
 main: com.github.derwisch.paperMail.PaperMail
-version: 1.0.0.3
+version: 1.0.0.4
       
 commands:
    papermail:
@@ -13,13 +13,20 @@ permissions:
         children:
             papermail.send.text: true
             papermail.send.item.box: true
-            papermail.createchest: true
+            papermail.createchest.self: true
+            papermail.createchest.everyone: true
     papermail.send.text:
         description: Allows to send textmails
         default: true
     papermail.send.item:
         description: Allows to send papermails via a mailbox
         default: true
-    papermail.createchest:
-        description: Allows to create mailbox chests
+    papermail.createchest.self:
+        description: Allows to create mailbox chests for the player
         default: true
+    papermail.createchest.everyone:
+        description: Allows to create mailbox chests for everyone
+        default: false
+        children:
+            papermail.createchest.self: true
+        
