@@ -1,6 +1,6 @@
 name: PaperMail
 main: com.github.derwisch.paperMail.PaperMail
-version: 1.0.0.4
+version: 1.0.0.6
       
 commands:
    papermail:
