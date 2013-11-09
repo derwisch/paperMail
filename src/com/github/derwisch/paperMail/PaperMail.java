@@ -57,7 +57,7 @@ public class PaperMail extends JavaPlugin {
     }
     
     private void initializeRecipes() {
-		ItemStack letterPaper = new ItemStack(Settings.MailItemID);
+		ItemStack letterPaper = new ItemStack(Material.getMaterial(Settings.MailItemID));
 		ItemMeta letterPaperMeta = letterPaper.getItemMeta();
 		ArrayList<String> letterPaperLore = new ArrayList<String>();
 		letterPaperMeta.setDisplayName(ChatColor.WHITE + Settings.MailItemName + ChatColor.RESET);
