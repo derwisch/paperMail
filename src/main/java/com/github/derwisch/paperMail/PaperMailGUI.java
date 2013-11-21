@@ -26,6 +26,7 @@ public class PaperMailGUI {
 	
 	public Inventory Inventory;
 	public Player Player;
+	public static boolean cancel = false;
 	
 	private ItemStack recipientMessage; 
 	private ItemStack sendButtonEnabled;
@@ -130,7 +131,10 @@ public class PaperMailGUI {
 		Result = SendingGUIClickResult.CANCEL;
 	}
 	
-	public void SendContents() {		
+	public void SendContents() {
+		Player player = this.Player;
+		int NumItems = 0;
+		double perCost = 0;
 		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
 		String playerName = "";
 		
@@ -145,6 +149,8 @@ public class PaperMailGUI {
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
 				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE) {
 				sendingContents.add(itemStack);
+					if((Settings.PerItemCosts) == true)
+						NumItems = NumItems +1;
 			}
 			
 			if (itemStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
@@ -152,16 +158,35 @@ public class PaperMailGUI {
 				playerName = bookMeta.getTitle();
 			}
 		}
+		perCost = Settings.ItemCost;
+		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true))
+		{
+				NumItems = NumItems - 1;
+				perCost = Settings.ItemCost * NumItems;
+		}
+		if (Settings.EnableMailCosts == true){
+			PaperMailEconomy.hasMoney(perCost, player);
+			if (PaperMailEconomy.hasMoney == true){
+				PaperMailEconomy.takeMoney(perCost, player);
+				Inbox inbox = Inbox.GetInbox(playerName);
+				inbox.AddItems(sendingContents, Player);	
+			}else if(PaperMailEconomy.hasMoney == false){
+				player.sendMessage(ChatColor.RED + "Not Enough Money to send your mail, items not sent!");
+				close();
+			}
+		}else{
+			Inbox inbox = Inbox.GetInbox(playerName);
+			inbox.AddItems(sendingContents, Player);	
+		}
 		
-		Inbox inbox = Inbox.GetInbox(playerName);
-		inbox.AddItems(sendingContents, Player);
+		
 		
 		if (paperSent) {
 			ItemStack itemInHand = Player.getInventory().getItemInHand();
 			itemInHand.setAmount(itemInHand.getAmount() - 1);
 			Player.setItemInHand(itemInHand);
 		}
-		
+		if(cancel == false)
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);
 	}
 	
@@ -172,4 +197,5 @@ public class PaperMailGUI {
 		}
 		return null;
 	}
+	
 }

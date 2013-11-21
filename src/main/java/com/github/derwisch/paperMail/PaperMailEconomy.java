@@ -58,7 +58,6 @@ public class PaperMailEconomy{
        StringBuilder sb = new StringBuilder();
        sb.append("");
        sb.append(goldPrice);
-       String strI = sb.toString();
        player.sendMessage(ChatColor.GREEN + "%price% Gold Ingots removed from Inventory!".replace("%price%", sb.append(ChatColor.WHITE)).toString());    
       }
     }

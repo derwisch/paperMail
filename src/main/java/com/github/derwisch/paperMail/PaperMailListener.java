@@ -163,7 +163,7 @@ public class PaperMailListener implements Listener {
     		PaperMailGUI gui = PaperMailGUI.GetGUIfromPlayer(player);
     		World world = player.getWorld();
     		Location playerLocation = player.getLocation();
-    		if (gui.Result == SendingGUIClickResult.CANCEL) {
+    		if ((gui.Result == SendingGUIClickResult.CANCEL) && (gui.Result != null)) {
     			gui.SetClosed();
     			ItemStack[] inventoryContents = inventory.getContents();
     			if (inventoryContents != null) {

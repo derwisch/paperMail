@@ -3,7 +3,9 @@ general:
     EnableItemMail: true
     EnableEnderchest: true
     EnableMailCosts: false
-    CostToSend: 0
+    EnablePerItemCosts: false
+    CostToText: 0
+    SendItemCost: 0
     MailWindowRows: 3
     DefaultBoxRows: 4
     EnderChestRequirementID: 368   
