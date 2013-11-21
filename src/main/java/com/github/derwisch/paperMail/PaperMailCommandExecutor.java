@@ -16,13 +16,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class PaperMailCommandExecutor implements CommandExecutor {
     
 	private PaperMail plugin;
+	private double Cost = Settings.Price;
  
 	public PaperMailCommandExecutor(PaperMail plugin) {
 		this.plugin = plugin;
 		this.plugin.getLogger().info("ItemMailCommandExecutor initialized");
 	}
  
-	@Override
+	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {		
 		if (cmd.getName().equalsIgnoreCase("papermail")){
 			if (!(sender instanceof Player) && args.length > 0) {
@@ -51,24 +52,26 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						player.sendMessage(ChatColor.DARK_RED + "Missing text of textmail!" + ChatColor.RESET);
 						return true;
 					}
+					if(Settings.EnableMailCosts == true){
+						PaperMailEconomy.hasMoney(Settings.Price, player);
+						if(PaperMailEconomy.hasMoney == true){
+						ItemStack itemStack = new ItemStack(Material.PAPER);
+						ItemMeta itemMeta = itemStack.getItemMeta();
 					
-					ItemStack itemStack = new ItemStack(Material.PAPER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
+						itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
+						ArrayList<String> lines = new ArrayList<String>();
 					
-					itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
-					ArrayList<String> lines = new ArrayList<String>();
+						int count = 0;
+						String currentLine = "";
 					
-					int count = 0;
-					String currentLine = "";
-					
-					for (int i = 2; i < args.length; i++) {
-						currentLine += args[i] + " ";
-						count += args[i].length() + 1;
-						if (++count >= 20) {
-							count = 0;
-							lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
-							currentLine = "";
-						}
+						for (int i = 2; i < args.length; i++) {
+							currentLine += args[i] + " ";
+							count += args[i].length() + 1;
+							if (++count >= 20) {
+								count = 0;
+								lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+								currentLine = "";
+							}
 					}
 					
 					if (currentLine != "") {
@@ -79,8 +82,44 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					itemStack.setItemMeta(itemMeta);
 					
 					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
-
+                  
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+                    PaperMailEconomy.takeMoney(Cost, player);
+						}else{
+	                    	player.sendMessage(ChatColor.RED + "Not Enough Money to send your mail!");
+						}
+                    }
+					if(Settings.EnableMailCosts == false){
+							ItemStack itemStack = new ItemStack(Material.PAPER);
+							ItemMeta itemMeta = itemStack.getItemMeta();
+						
+							itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
+							ArrayList<String> lines = new ArrayList<String>();
+						
+							int count = 0;
+							String currentLine = "";
+						
+							for (int i = 2; i < args.length; i++) {
+								currentLine += args[i] + " ";
+								count += args[i].length() + 1;
+								if (++count >= 20) {
+									count = 0;
+									lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+									currentLine = "";
+								}
+						}
+						
+						if (currentLine != "") {
+							lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);	
+						}
+						
+						itemMeta.setLore(lines);
+						itemStack.setItemMeta(itemMeta);
+						
+						Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+	                  
+						player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+					}
 					return true;
 				}
 
@@ -92,7 +131,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					} else if (args.length == 2 && player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)) {
 						inbox = Inbox.GetInbox(args[1]);
 					} else {
-						player.sendMessage(ChatColor.DARK_RED + "Too much arguments!" + ChatColor.RESET);
+						player.sendMessage(ChatColor.DARK_RED + "Too many arguments!" + ChatColor.RESET);
 						return true;
 					}
 					

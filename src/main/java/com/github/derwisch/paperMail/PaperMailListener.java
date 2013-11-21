@@ -123,7 +123,6 @@ public class PaperMailListener implements Listener {
     	PaperMailListener.player = player;
     	PaperMailListener.inventory = inventory;
     	PaperMail.server.getScheduler().scheduleSyncDelayedTask(PaperMail.instance, new Runnable() {
-    		@Override 
     	    public void run() {
     	    	openInventory(PaperMailListener.player, PaperMailListener.inventory);
     	    }
