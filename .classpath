@@ -12,5 +12,14 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/DrkMatr/.m2/repository/org/bukkit/craftbukkit/1.6.4-R2.0/craftbukkit-1.6.4-R2.0.jar" sourcepath="/CraftBukkit">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.bukkit"/>
+			<attribute name="maven.artifactId" value="craftbukkit"/>
+			<attribute name="maven.version" value="1.6.4-R2.0"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

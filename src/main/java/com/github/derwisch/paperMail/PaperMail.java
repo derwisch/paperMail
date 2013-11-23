@@ -90,7 +90,7 @@ public class PaperMail extends JavaPlugin {
 			if (player == null) {
 				continue;
 			}
-			Inbox.AddInbox(player.getDisplayName());
+			Inbox.AddInbox(player.getName());
 		}
 		for (OfflinePlayer offPlayer : getServer().getOfflinePlayers()) {
 			
@@ -99,7 +99,7 @@ public class PaperMail extends JavaPlugin {
 			if (player == null) {
 				continue;
 			}
-			Inbox.AddInbox(player.getDisplayName());
+			Inbox.AddInbox(player.getName());
 		}
 	}
     

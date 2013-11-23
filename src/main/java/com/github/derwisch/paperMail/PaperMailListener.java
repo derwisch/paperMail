@@ -45,7 +45,7 @@ public class PaperMailListener implements Listener {
                 if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 	new PaperMailGUI(player).Show();
                 } else if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                	Inbox inbox = Inbox.GetInbox(player.getDisplayName());
+                	Inbox inbox = Inbox.GetInbox(player.getName());
                 	inbox.openInbox();
                 	event.setCancelled(true);
                 }
@@ -211,14 +211,14 @@ public class PaperMailListener implements Listener {
 
     	if (inventory.getName() == PaperMail.INBOX_GUI_TITLE) {
     		Player player = ((Player)inventory.getHolder());
-    		Inbox inbox = Inbox.GetInbox(player.getDisplayName());
+    		Inbox inbox = Inbox.GetInbox(player.getName());
     		inbox.SaveInbox();
     	}
     	
     	
     	if (inventory.getType().toString() == "ENDER_CHEST") {
         	Player player = (Player)event.getPlayer();
-        	PaperMailGUI gui = PaperMailGUI.GetOpenGUI(player.getDisplayName());
+        	PaperMailGUI gui = PaperMailGUI.GetOpenGUI(player.getName());
         	if (gui != null) {
         		OpenInventory(player, gui.Inventory);
         		gui.Result = SendingGUIClickResult.CANCEL;

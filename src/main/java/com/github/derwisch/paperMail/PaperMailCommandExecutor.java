@@ -125,7 +125,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					Inbox inbox;
 					
 					if (args.length == 1 && (player.hasPermission(Permissions.CREATE_CHEST_SELF_PERM)  || player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM))) {
-						inbox = Inbox.GetInbox(player.getDisplayName());
+						inbox = Inbox.GetInbox(player.getName());
 					} else if (args.length == 2 && player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)) {
 						inbox = Inbox.GetInbox(args[1]);
 					} else {

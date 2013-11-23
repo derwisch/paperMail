@@ -117,12 +117,12 @@ public class PaperMailGUI {
 	public void Show() {
 		if (Settings.EnableItemMail) {
 			Player.openInventory(Inventory);
-			openGUIs.put(Player.getDisplayName(), this);
+			openGUIs.put(Player.getName(), this);
 		}
 	}
 	
 	public void SetClosed() {
-		RemoveGUI(Player.getDisplayName());
+		RemoveGUI(Player.getName());
 		itemMailGUIs.remove(this);
 	}
 		
