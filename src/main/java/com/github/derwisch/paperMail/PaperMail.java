@@ -42,7 +42,7 @@ public class PaperMail extends JavaPlugin {
     	Settings.LoadConfiguration(configuration);
     	//Load Economy
     	if (setupEconomy().booleanValue())
-    		System.out.println(this + " has successfully linked with " + economy.getName() + ", via Vault");
+    		System.out.println(this + " linked into " + economy.getName() + ", via Vault");
         if ((setupEconomy() == false) && (Settings.EnableMailCosts == true)) {
         	System.out.println(this + ": Vault economy not found, switching to gold ingots!");
         }

@@ -4,6 +4,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.meta.BookMeta;
+
 
 public class PaperMailEconomy{
 	public static boolean hasMoney = true;
@@ -61,24 +67,51 @@ public class PaperMailEconomy{
        player.sendMessage(ChatColor.GREEN + "%price% Gold Ingots removed from Inventory!".replace("%price%", sb.append(ChatColor.WHITE)).toString());    
       }
     }
-  public static void hasMoney(Double price, Player player){
-	  if (!(PaperMail.isGoldIngot())) {
-		  if (PaperMail.economy.getBalance(player.getName()) <= price.doubleValue()) {
+  public static boolean hasMoney(Double price, Player player){
+	  if ((!(PaperMail.isGoldIngot())) && (Settings.EnableMailCosts != false) && (price != 0)) {
+		  if (PaperMail.economy.getBalance(player.getName()) < price.doubleValue()) {
 		  		hasMoney = false;
-		  		return;
+		  		return false;
 				 }
-	  }else{
+	  }else if((PaperMail.isGoldIngot()) && (Settings.EnableMailCosts != false) && (price != 0)){
 		  int goldAmount = goldCounter(player);
 		  int goldPrice = (int)Math.ceil(price.doubleValue());
 		  if (goldAmount < goldPrice) {
 		         hasMoney = false;
+		         return false;
 		  }
 		  
 	  }
 	  hasMoney = true;
-	  return;
+	  return true;
   }
   
+ public static double ItemCost(InventoryClickEvent event){ 
+	int NumItems = 0;
+	double perCost = 0;
+	perCost = Settings.ItemCost;
+	Inventory Inventory = event.getInventory();
+	for (int i = 0; i < Inventory.getSize(); i++) {
+		ItemStack itemStack = Inventory.getItem(i);
+		
+		if (itemStack == null)
+			continue;
+		
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (itemMeta.getDisplayName() != PaperMailGUI.SEND_BUTTON_ON_TITLE && 
+			itemMeta.getDisplayName() != PaperMailGUI.CANCEL_BUTTON_TITLE && 
+			itemMeta.getDisplayName() != PaperMailGUI.ENDERCHEST_BUTTON_TITLE) {
+				if((Settings.PerItemCosts) == true)
+					NumItems = NumItems +1;
+		}
+	}
+		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (perCost != 0))
+		{
+				NumItems = NumItems - 1;
+				perCost = Settings.ItemCost * NumItems;
+		}
+	return perCost;
+ }
 }
 
 

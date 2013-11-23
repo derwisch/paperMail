@@ -52,9 +52,8 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						player.sendMessage(ChatColor.DARK_RED + "Missing text of textmail!" + ChatColor.RESET);
 						return true;
 					}
-					if(Settings.EnableMailCosts == true){
-						PaperMailEconomy.hasMoney(Settings.Price, player);
-						if(PaperMailEconomy.hasMoney == true){
+					if((Settings.EnableMailCosts == true) && (Settings.Price != 0)){
+						if(PaperMailEconomy.hasMoney(Settings.Price, player) == true){
 						ItemStack itemStack = new ItemStack(Material.PAPER);
 						ItemMeta itemMeta = itemStack.getItemMeta();
 					
@@ -88,8 +87,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						}else{
 	                    	player.sendMessage(ChatColor.RED + "Not Enough Money to send your mail!");
 						}
-                    }
-					if(Settings.EnableMailCosts == false){
+                    }else if(Settings.EnableMailCosts == false){
 							ItemStack itemStack = new ItemStack(Material.PAPER);
 							ItemMeta itemMeta = itemStack.getItemMeta();
 						
