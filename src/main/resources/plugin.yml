@@ -1,7 +1,8 @@
-author: DrkMatr1984
 name: PaperMail
-main: com.github.derwisch.paperMail.PaperMail
 version: 1.0.0.7
+author: DrkMatr1984
+main: com.github.derwisch.paperMail.PaperMail
+softdepend: [Vault]
       
 commands:
    papermail:
