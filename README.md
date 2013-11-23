@@ -17,3 +17,5 @@ To Compile, Download the contents of this Repo, Make sure you have maven install
 mvn clean package
 
 from the project root.
+
+//Fix peritemcosts only counting per stack and not per item.
