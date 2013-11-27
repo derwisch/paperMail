@@ -9,6 +9,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -79,8 +80,8 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					
 					itemMeta.setLore(lines);
 					itemStack.setItemMeta(itemMeta);
-					
-					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+					net.minecraft.server.v1_6_R3.ItemStack MineStack = CraftItemStack.asNMSCopy(itemStack);
+					Inbox.GetInbox(args[1]).AddItem(MineStack, player);
                   
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
                     PaperMailEconomy.takeMoney(Cost, player);
@@ -113,8 +114,8 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						
 						itemMeta.setLore(lines);
 						itemStack.setItemMeta(itemMeta);
-						
-						Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+						net.minecraft.server.v1_6_R3.ItemStack MineStack = CraftItemStack.asNMSCopy(itemStack);
+						Inbox.GetInbox(args[1]).AddItem(MineStack, player);
 	                  
 						player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					}

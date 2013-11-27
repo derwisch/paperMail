@@ -182,7 +182,7 @@ public class PaperMailListener implements Listener {
     	Inventory inventory = event.getInventory();
     	
     	if (inventory.getName() == PaperMail.NEW_MAIL_GUI_TITLE) {
-    		Player player = ((Player)inventory.getHolder());
+    		Player player = (Player) event.getPlayer();
     		PaperMailGUI gui = PaperMailGUI.GetGUIfromPlayer(player);
     		World world = player.getWorld();
     		Location playerLocation = player.getLocation();
@@ -210,7 +210,7 @@ public class PaperMailListener implements Listener {
     	}
 
     	if (inventory.getName() == PaperMail.INBOX_GUI_TITLE) {
-    		Player player = ((Player)inventory.getHolder());
+    		Player player = (Player) event.getPlayer();
     		Inbox inbox = Inbox.GetInbox(player.getName());
     		inbox.SaveInbox();
     	}

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
 //import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -131,22 +132,23 @@ public class PaperMailGUI {
 	}
 	
 	public void SendContents() {
-		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
+		ArrayList<net.minecraft.server.v1_6_R3.ItemStack> sendingContents = new ArrayList<net.minecraft.server.v1_6_R3.ItemStack>();
 		String playerName = "";
 		
 		for (int i = 0; i < Inventory.getSize(); i++) {
-			ItemStack itemStack = Inventory.getItem(i);
 			
+			net.minecraft.server.v1_6_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(Inventory.getItem(i));
+			ItemStack CraftStack = Inventory.getItem(i);
 			if (itemStack == null)
 				continue;
 			
-			ItemMeta itemMeta = itemStack.getItemMeta();
+			ItemMeta itemMeta = CraftStack.getItemMeta();
 			if (itemMeta.getDisplayName() != SEND_BUTTON_ON_TITLE && 
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
 				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE) {
 				sendingContents.add(itemStack);
 			}
-			if (itemStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
+			if (CraftStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
 				BookMeta bookMeta = (BookMeta)itemMeta;
 				playerName = bookMeta.getTitle();
 			}
@@ -169,5 +171,7 @@ public class PaperMailGUI {
 		}
 		return null;
 	}
+	
+	
 	
 }

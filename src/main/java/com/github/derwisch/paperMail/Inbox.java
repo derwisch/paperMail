@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -89,13 +90,18 @@ public class Inbox {
 	private void loadItems() {
 		int i = 0;
 		ItemStack stack = null;
+		String item = null;
 		do {
-			stack = playerConfig.getItemStack("itemstack." + i);
+			item = playerConfig.getString("itemstack." + i);
+			if (item != null){
+			stack = ClassItemStacksAndStrings.stringToItemStack(item);
+			}
 			if (stack != null) {
+				System.out.println("Item Added");
 				inventory.addItem(stack);
 			}
 			i++;
-		} while (stack != null);
+		} while ((stack != null) && (item != null));
 	}
 
 	private void saveChest() {
@@ -118,12 +124,19 @@ public class Inbox {
 	
 	private void saveItems() {
 		for (int i = 0; i < Settings.DefaultBoxRows * 9; i++) {
-			ItemStack stack = inventory.getItem(i);
+			CraftItemStack stack = (CraftItemStack) this.inventory.getItem(i);
 			if (stack != null) {
-				playerConfig.set("itemstack." + i, stack);
+				String item = ClassItemStacksAndStrings.itemstackToString(stack);
+				playerConfig.set("itemstack." + i, item);
+				System.out.println("Item saved");
 			}
+			if (stack == null)
+			{
+				String item = null;
+				playerConfig.set("itemstack." + i, item);
+			}
+			
 		}
-		
 		configAccessor.saveConfig();
 	}
 	
@@ -138,7 +151,9 @@ public class Inbox {
 		saveChest();
 	}
 	
-	public void AddItem(ItemStack itemStack, Player sender) {
+	public void AddItem(net.minecraft.server.v1_6_R3.ItemStack MineStack, Player sender) {
+		CraftItemStack itemStack;
+		itemStack = CraftItemStack.asCraftMirror(MineStack);
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		if (inboxChest != null) {
 			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
@@ -155,8 +170,8 @@ public class Inbox {
 		saveItems();
 	}
 	
-	public void AddItems(Collection<ItemStack> items, Player sender) {
-		for (ItemStack itemStack : items) {
+	public void AddItems(Collection<net.minecraft.server.v1_6_R3.ItemStack> items, Player sender) {
+		for (net.minecraft.server.v1_6_R3.ItemStack itemStack : items) {
 			AddItem(itemStack, sender);
 		}
 	}
@@ -165,4 +180,5 @@ public class Inbox {
 		saveItems();
 		saveChest();
 	}
+	
 }
