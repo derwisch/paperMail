@@ -97,7 +97,6 @@ public class Inbox {
 			stack = ClassItemStacksAndStrings.stringToItemStack(item);
 			}
 			if (stack != null) {
-				System.out.println("Item Added");
 				inventory.addItem(stack);
 			}
 			i++;
@@ -128,7 +127,6 @@ public class Inbox {
 			if (stack != null) {
 				String item = ClassItemStacksAndStrings.itemstackToString(stack);
 				playerConfig.set("itemstack." + i, item);
-				System.out.println("Item saved");
 			}
 			if (stack == null)
 			{
