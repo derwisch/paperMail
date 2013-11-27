@@ -85,33 +85,6 @@ public class PaperMailEconomy{
 	  hasMoney = true;
 	  return true;
   }
-  
- public static double ItemCost(InventoryClickEvent event){ 
-	int NumItems = 0;
-	double perCost = 0;
-	perCost = Settings.ItemCost;
-	Inventory Inventory = event.getInventory();
-	for (int i = 0; i < Inventory.getSize(); i++) {
-		ItemStack itemStack = Inventory.getItem(i);
-		
-		if (itemStack == null)
-			continue;
-		
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		if (itemMeta.getDisplayName() != PaperMailGUI.SEND_BUTTON_ON_TITLE && 
-			itemMeta.getDisplayName() != PaperMailGUI.CANCEL_BUTTON_TITLE && 
-			itemMeta.getDisplayName() != PaperMailGUI.ENDERCHEST_BUTTON_TITLE) {
-				if((Settings.PerItemCosts) == true)
-					NumItems = NumItems +1;
-		}
-	}
-		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (perCost != 0))
-		{
-				NumItems = NumItems - 1;
-				perCost = Settings.ItemCost * NumItems;
-		}
-	return perCost;
- }
 }
 
 

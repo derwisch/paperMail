@@ -53,7 +53,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						player.sendMessage(ChatColor.DARK_RED + "Missing text of textmail!" + ChatColor.RESET);
 						return true;
 					}
-					if((Settings.EnableMailCosts == true) && (Settings.Price != 0)){
+					if((Settings.EnableMailCosts == true) && (Settings.Price != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT))){
 						if(PaperMailEconomy.hasMoney(Settings.Price, player) == true){
 						ItemStack itemStack = new ItemStack(Material.PAPER);
 						ItemMeta itemMeta = itemStack.getItemMeta();

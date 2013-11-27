@@ -132,9 +132,11 @@ public class PaperMailGUI {
 	}
 	
 	public void SendContents() {
+		Player player = this.Player;
 		ArrayList<net.minecraft.server.v1_6_R3.ItemStack> sendingContents = new ArrayList<net.minecraft.server.v1_6_R3.ItemStack>();
 		String playerName = "";
-		
+		int numItems = 0;
+		double itemCost = Settings.ItemCost;
 		for (int i = 0; i < Inventory.getSize(); i++) {
 			
 			net.minecraft.server.v1_6_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(Inventory.getItem(i));
@@ -145,8 +147,10 @@ public class PaperMailGUI {
 			ItemMeta itemMeta = CraftStack.getItemMeta();
 			if (itemMeta.getDisplayName() != SEND_BUTTON_ON_TITLE && 
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
-				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE) {
+				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE &&
+				CraftStack.getType() != Material.WRITTEN_BOOK) {
 				sendingContents.add(itemStack);
+				numItems = numItems + CraftStack.getAmount();
 			}
 			if (CraftStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
 				BookMeta bookMeta = (BookMeta)itemMeta;
@@ -155,7 +159,13 @@ public class PaperMailGUI {
 		}
 			Inbox inbox = Inbox.GetInbox(playerName);
 			inbox.AddItems(sendingContents, Player);	
-				
+		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
+			itemCost = numItems * Settings.ItemCost;
+			PaperMailEconomy.takeMoney(itemCost, player);
+		}
+		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == false) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
+			PaperMailEconomy.takeMoney(itemCost, player);
+		}
 		if (paperSent) {
 			ItemStack itemInHand = Player.getInventory().getItemInHand();
 			itemInHand.setAmount(itemInHand.getAmount() - 1);
