@@ -7,7 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 //import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -133,13 +133,13 @@ public class PaperMailGUI {
 	
 	public void SendContents() {
 		Player player = this.Player;
-		ArrayList<net.minecraft.server.v1_6_R3.ItemStack> sendingContents = new ArrayList<net.minecraft.server.v1_6_R3.ItemStack>();
+		ArrayList<net.minecraft.server.v1_7_R1.ItemStack> sendingContents = new ArrayList<net.minecraft.server.v1_7_R1.ItemStack>();
 		String playerName = "";
 		int numItems = 0;
 		double itemCost = Settings.ItemCost;
 		for (int i = 0; i < Inventory.getSize(); i++) {
 			
-			net.minecraft.server.v1_6_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(Inventory.getItem(i));
+			net.minecraft.server.v1_7_R1.ItemStack itemStack = CraftItemStack.asNMSCopy(Inventory.getItem(i));
 			ItemStack CraftStack = Inventory.getItem(i);
 			if (itemStack == null)
 				continue;
