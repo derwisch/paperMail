@@ -80,15 +80,17 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					
 					itemMeta.setLore(lines);
 					itemStack.setItemMeta(itemMeta);
-					net.minecraft.server.v1_7_R1.ItemStack MineStack = CraftItemStack.asNMSCopy(itemStack);
-					Inbox.GetInbox(args[1]).AddItem(MineStack, player);
+					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
                   
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
                     PaperMailEconomy.takeMoney(Cost, player);
+                    return true;
 						}else{
 	                    	player.sendMessage(ChatColor.RED + "Not Enough Money to send your mail!");
+	                    	return true;
 						}
-                    }else if(Settings.EnableMailCosts == false){
+                    }
+					if(Settings.EnableMailCosts == false){
 							ItemStack itemStack = new ItemStack(Material.PAPER);
 							ItemMeta itemMeta = itemStack.getItemMeta();
 						
@@ -114,12 +116,42 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						
 						itemMeta.setLore(lines);
 						itemStack.setItemMeta(itemMeta);
-						net.minecraft.server.v1_7_R1.ItemStack MineStack = CraftItemStack.asNMSCopy(itemStack);
-						Inbox.GetInbox(args[1]).AddItem(MineStack, player);
+						Inbox.GetInbox(args[1]).AddItem(itemStack, player);
 	                  
 						player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+						return true;
 					}
+					if(player.hasPermission(Permissions.COSTS_EXEMPT)){
+						ItemStack itemStack = new ItemStack(Material.PAPER);
+						ItemMeta itemMeta = itemStack.getItemMeta();
+					
+						itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
+						ArrayList<String> lines = new ArrayList<String>();
+					
+						int count = 0;
+						String currentLine = "";
+					
+						for (int i = 2; i < args.length; i++) {
+							currentLine += args[i] + " ";
+							count += args[i].length() + 1;
+							if (++count >= 20) {
+								count = 0;
+								lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+								currentLine = "";
+							}
+					}
+					
+					if (currentLine != "") {
+						lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);	
+					}
+					
+					itemMeta.setLore(lines);
+					itemStack.setItemMeta(itemMeta);
+					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+                  
+					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					return true;
+					}
 				}
 
 				if (args[0].toLowerCase().equals("createbox")) {
