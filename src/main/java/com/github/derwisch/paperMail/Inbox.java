@@ -24,7 +24,6 @@ import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Inbox {
 	
@@ -95,6 +94,7 @@ public class Inbox {
 			}
 		}
 		list = c.getList("inventory");
+		
 		c.set("inventory",list);
 		try {
 			NBTCompressedStreamTools.a(c, new FileOutputStream(file));
@@ -128,25 +128,15 @@ public class Inbox {
 	
 	private void loadItems() {
 		int i = 0;
-		ItemStack stack = null;
 		ItemStack oldstack = null;
-		String itemname = null;
 		do {
 			oldstack = playerConfig.getItemStack("itemstack." + i);
-			itemname = playerConfig.getString("itemstack." + i);
-			if (itemname != null){
-			stack = ClassItemStacksAndStrings.stringToItemStack(itemname);
-			}
-			if (stack != null) {
-				playerConfig.set("itemstack." + i, "");
-				inventory.addItem(stack);
-			}
 			if (oldstack != null){
 				playerConfig.set("itemstack." + i, "");
 				inventory.addItem(oldstack);
 			}
 			i++;
-		} while ((stack != null) && (itemname != null));
+		} while (oldstack != null);
 		if(!file.exists())
 			try {
 				file.createNewFile();
@@ -163,12 +153,13 @@ public class Inbox {
 		NBTTagList list = c.getList("inventory");
 		CraftItemStack cis = null;
 		for(int n = 0; n < list.size(); n++){
-			  NBTTagCompound item = (NBTTagCompound)list.get(n);
+			  NBTTagCompound item = new NBTTagCompound();
+			  item = (NBTTagCompound) list.get(n);
 			  if(item != null){
 			  int index = item.getInt("index");
 			  net.minecraft.server.v1_6_R3.ItemStack is = net.minecraft.server.v1_6_R3.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
 			  cis = CraftItemStack.asCraftMirror(is);
-			  if(stack != cis){
+			  if(oldstack != cis){
 			  inventory.setItem(index,cis);
 			  }
 			  }
@@ -194,12 +185,11 @@ public class Inbox {
 		 configAccessor.saveConfig();
 	}
 	
-	@SuppressWarnings("null")
 	private void saveItems() {
 		for(int index = 0; index < inventory.getContents().length; index++){
-			  CraftItemStack cis = (CraftItemStack)inventory.getItem(index);
+			  ItemStack cis = inventory.getItem(index);
 			  if((cis!=null)){
-			    net.minecraft.server.v1_6_R3.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
+				  net.minecraft.server.v1_6_R3.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
 			    NBTTagCompound itemCompound = new NBTTagCompound();
 			    itemCompound = is.save(itemCompound);
 			    itemCompound.set("index",new NBTTagInt("index",index));
@@ -212,7 +202,6 @@ public class Inbox {
 			  }
 			}
 		c.set("inventory",list);
-		file.delete();
 		if(file.exists() == false){
 			try {
 				file.createNewFile();
@@ -240,9 +229,7 @@ public class Inbox {
 		saveChest();
 	}
 	
-	public void AddItem(net.minecraft.server.v1_6_R3.ItemStack MineStack, Player sender) {
-		CraftItemStack itemStack;
-		itemStack = CraftItemStack.asCraftMirror(MineStack);
+	public void AddItem(ItemStack itemStack, Player sender) {
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		if (inboxChest != null) {
 			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
@@ -259,8 +246,8 @@ public class Inbox {
 		saveItems();
 	}
 	
-	public void AddItems(Collection<net.minecraft.server.v1_6_R3.ItemStack> items, Player sender) {
-		for (net.minecraft.server.v1_6_R3.ItemStack itemStack : items) {
+	public void AddItems(Collection<ItemStack> items, Player sender) {
+		for (ItemStack itemStack : items) {
 			AddItem(itemStack, sender);
 		}
 	}

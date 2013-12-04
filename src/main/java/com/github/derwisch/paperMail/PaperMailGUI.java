@@ -133,15 +133,14 @@ public class PaperMailGUI {
 	
 	public void SendContents() {
 		Player player = this.Player;
-		ArrayList<net.minecraft.server.v1_6_R3.ItemStack> sendingContents = new ArrayList<net.minecraft.server.v1_6_R3.ItemStack>();
+		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
 		String playerName = "";
 		int numItems = 0;
 		double itemCost = Settings.ItemCost;
 		for (int i = 0; i < Inventory.getSize(); i++) {
 			
-			net.minecraft.server.v1_6_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(Inventory.getItem(i));
 			ItemStack CraftStack = Inventory.getItem(i);
-			if (itemStack == null)
+			if (CraftStack == null)
 				continue;
 			
 			ItemMeta itemMeta = CraftStack.getItemMeta();
@@ -149,7 +148,7 @@ public class PaperMailGUI {
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
 				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE &&
 				CraftStack.getType() != Material.WRITTEN_BOOK) {
-				sendingContents.add(itemStack);
+				sendingContents.add(CraftStack);
 				numItems = numItems + CraftStack.getAmount();
 			}
 			if (CraftStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
