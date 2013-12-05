@@ -1,8 +1,18 @@
 package com.github.derwisch.paperMail;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import net.minecraft.server.v1_7_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_7_R1.NBTTagCompound;
+import net.minecraft.server.v1_7_R1.NBTTagInt;
+import net.minecraft.server.v1_7_R1.NBTTagList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +41,7 @@ public class Inbox {
 				return inbox;
 			}
 		}
+		//if player does not yet exist or have an inbox
 		AddInbox(playerName);
 		return GetInbox(playerName);
 	}
@@ -54,15 +66,44 @@ public class Inbox {
 	public Inventory inventory;
 	public Chest inboxChest;
 	
+	private NBTTagCompound c = new NBTTagCompound();
+	private NBTTagList list = new NBTTagList();
 	private FileConfiguration playerConfig;
 	private ConfigAccessor configAccessor;
-	
+	private File file; 
 	public Inbox(String playerName) {
 		this.playerName = playerName;
+		String filename = playerName + ".txt";
 		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + playerName + ".yml");
 		this.playerConfig = configAccessor.getConfig();
 		configAccessor.saveConfig();
+		file = new File(PaperMail.instance.getDataFolder(), "players\\" + filename);
+		if(file.exists())
+		{
+			try {
+				c = NBTCompressedStreamTools.a(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		list = c.getList("inventory", 10);
 		
+		c.set("inventory",list);
+		try {
+			NBTCompressedStreamTools.a(c, new FileOutputStream(file));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		configAccessor.saveConfig();
 		initMailBox();
 		loadChest();
 		loadItems();
@@ -88,14 +129,43 @@ public class Inbox {
 	
 	private void loadItems() {
 		int i = 0;
-		ItemStack stack = null;
+		ItemStack oldstack = null;
 		do {
-			stack = playerConfig.getItemStack("itemstack." + i);
-			if (stack != null) {
-				inventory.addItem(stack);
+			oldstack = playerConfig.getItemStack("itemstack." + i);
+			if (oldstack != null){
+				playerConfig.set("itemstack." + i, "");
+				inventory.addItem(oldstack);
 			}
 			i++;
-		} while (stack != null);
+		} while (oldstack != null);
+		if(!file.exists())
+			try {
+				file.createNewFile();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		try {
+			c = NBTCompressedStreamTools.a(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		NBTTagList list = c.getList("inventory", 10);
+		CraftItemStack cis = null;
+		for(int n = 0; n < list.size(); n++){
+			  NBTTagCompound item = new NBTTagCompound();
+			  item = list.get(n);
+			  if(item != null){
+			  int index = item.getInt("index");
+			  net.minecraft.server.v1_7_R1.ItemStack is = net.minecraft.server.v1_7_R1.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
+			  cis = CraftItemStack.asCraftMirror(is);
+			  if(oldstack != cis){
+			  inventory.setItem(index,cis);
+			  }
+			  }
+			}
+		
 	}
 
 	private void saveChest() {
@@ -117,14 +187,36 @@ public class Inbox {
 	}
 	
 	private void saveItems() {
-		for (int i = 0; i < Settings.DefaultBoxRows * 9; i++) {
-			ItemStack stack = inventory.getItem(i);
-			if (stack != null) {
-				playerConfig.set("itemstack." + i, stack);
+		for(int index = 0; index < inventory.getContents().length; index++){
+			  ItemStack cis = inventory.getItem(index);
+			  if((cis!=null)){
+				  net.minecraft.server.v1_7_R1.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
+			    NBTTagCompound itemCompound = new NBTTagCompound();
+			    itemCompound = is.save(itemCompound);
+			    itemCompound.set("index",new NBTTagInt(index));
+			    list.add(itemCompound);
+			  }
+			  if(cis == null){
+				  NBTTagCompound itemCompound = new NBTTagCompound();
+				  itemCompound.set("index",new NBTTagInt(index));
+				  list.add(itemCompound);
+			  }
+			}
+		c.set("inventory",list);
+		if(file.exists() == false){
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		
-		configAccessor.saveConfig();
+		try {
+			NBTCompressedStreamTools.a(c, new FileOutputStream(file));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void openInbox() {
@@ -165,4 +257,5 @@ public class Inbox {
 		saveItems();
 		saveChest();
 	}
+	
 }

@@ -7,6 +7,8 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 //import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,7 +28,8 @@ public class PaperMailGUI {
 	
 	public Inventory Inventory;
 	public Player Player;
-	
+	public static boolean cancel = false;
+
 	private ItemStack recipientMessage; 
 	private ItemStack sendButtonEnabled;
 	private ItemStack cancelButton; 
@@ -116,52 +119,69 @@ public class PaperMailGUI {
 	public void Show() {
 		if (Settings.EnableItemMail) {
 			Player.openInventory(Inventory);
-			openGUIs.put(Player.getDisplayName(), this);
+			openGUIs.put(Player.getName(), this);
 		}
 	}
 	
 	public void SetClosed() {
-		RemoveGUI(Player.getDisplayName());
+		RemoveGUI(Player.getName());
 		itemMailGUIs.remove(this);
 	}
 		
 	public void close() {
 		Player.closeInventory();
-		Result = SendingGUIClickResult.CANCEL;
 	}
 	
-	public void SendContents() {		
+	public void SendContents() {
+		Player player = this.Player;
 		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
 		String playerName = "";
-		
+		int numItems = 0;
+		double itemCost = Settings.ItemCost;
 		for (int i = 0; i < Inventory.getSize(); i++) {
-			ItemStack itemStack = Inventory.getItem(i);
 			
-			if (itemStack == null)
+			ItemStack CraftStack = Inventory.getItem(i);
+			if (CraftStack == null)
 				continue;
 			
-			ItemMeta itemMeta = itemStack.getItemMeta();
+			ItemMeta itemMeta = CraftStack.getItemMeta();
 			if (itemMeta.getDisplayName() != SEND_BUTTON_ON_TITLE && 
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
-				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE) {
-				sendingContents.add(itemStack);
+				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE &&
+				CraftStack.getType() != Material.WRITTEN_BOOK) {
+				sendingContents.add(CraftStack);
+				numItems = numItems + CraftStack.getAmount();
 			}
-			
-			if (itemStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
+			if (CraftStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
 				BookMeta bookMeta = (BookMeta)itemMeta;
-				playerName = bookMeta.getTitle();
+				Player p = Bukkit.getPlayer(bookMeta.getTitle());
+				if (p != null) {
+					playerName = p.getName();
+				    } else {
+				    OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
+				    if (op != null) {
+				    	playerName = op.getName();
+				        } else {
+				        	playerName = bookMeta.getTitle();
+				        	player.sendMessage(ChatColor.DARK_RED + "Player "  + playerName + " may not exist or doesn't have an Inbox yet. Creating Inbox for player " + playerName + ChatColor.RESET);
+				        }
+				    }
 			}
 		}
-		
-		Inbox inbox = Inbox.GetInbox(playerName);
-		inbox.AddItems(sendingContents, Player);
-		
+			Inbox inbox = Inbox.GetInbox(playerName);
+			inbox.AddItems(sendingContents, Player);	
+		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
+			itemCost = numItems * Settings.ItemCost;
+			PaperMailEconomy.takeMoney(itemCost, player);
+		}
+		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == false) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
+			PaperMailEconomy.takeMoney(itemCost, player);
+		}
 		if (paperSent) {
 			ItemStack itemInHand = Player.getInventory().getItemInHand();
 			itemInHand.setAmount(itemInHand.getAmount() - 1);
 			Player.setItemInHand(itemInHand);
 		}
-		
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);
 	}
 	
@@ -172,4 +192,7 @@ public class PaperMailGUI {
 		}
 		return null;
 	}
+	
+	
+	
 }
