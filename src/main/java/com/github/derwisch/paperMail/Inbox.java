@@ -94,7 +94,11 @@ public class Inbox {
 				e.printStackTrace();
 			}
 		}
+<<<<<<< HEAD
 		list = c.getList("inventory", 10);
+=======
+		list = c.getList("inventory");
+>>>>>>> master
 		
 		c.set("inventory",list);
 		try {
@@ -155,7 +159,11 @@ public class Inbox {
 		CraftItemStack cis = null;
 		for(int n = 0; n < list.size(); n++){
 			  NBTTagCompound item = new NBTTagCompound();
+<<<<<<< HEAD
 			  item = list.get(n);
+=======
+			  item = (NBTTagCompound) list.get(n);
+>>>>>>> master
 			  if(item != null){
 			  int index = item.getInt("index");
 			  net.minecraft.server.v1_7_R1.ItemStack is = net.minecraft.server.v1_7_R1.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
@@ -190,7 +198,11 @@ public class Inbox {
 		for(int index = 0; index < inventory.getContents().length; index++){
 			  ItemStack cis = inventory.getItem(index);
 			  if((cis!=null)){
+<<<<<<< HEAD
 				  net.minecraft.server.v1_7_R1.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
+=======
+				  net.minecraft.server.v1_6_R3.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
+>>>>>>> master
 			    NBTTagCompound itemCompound = new NBTTagCompound();
 			    itemCompound = is.save(itemCompound);
 			    itemCompound.set("index",new NBTTagInt(index));

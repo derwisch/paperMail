@@ -58,15 +58,49 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					if((Settings.EnableMailCosts == true) && (Settings.Price != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT))){
 						//check if player has the correct amount of currency
 						if(PaperMailEconomy.hasMoney(Settings.Price, player) == true){
+<<<<<<< HEAD
 							sendText(player, args);
 							PaperMailEconomy.takeMoney(Cost, player);
 							return true;
 						//if player doesn't have enough money don't send textmail
+=======
+						ItemStack itemStack = new ItemStack(Material.PAPER);
+						ItemMeta itemMeta = itemStack.getItemMeta();
+					
+						itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
+						ArrayList<String> lines = new ArrayList<String>();
+					
+						int count = 0;
+						String currentLine = "";
+					
+						for (int i = 2; i < args.length; i++) {
+							currentLine += args[i] + " ";
+							count += args[i].length() + 1;
+							if (++count >= 20) {
+								count = 0;
+								lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+								currentLine = "";
+							}
+					}
+					
+					if (currentLine != "") {
+						lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);	
+					}
+					
+					itemMeta.setLore(lines);
+					itemStack.setItemMeta(itemMeta);
+					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+                  
+					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+                    PaperMailEconomy.takeMoney(Cost, player);
+                    return true;
+>>>>>>> master
 						}else{
 	                    	player.sendMessage(ChatColor.RED + "Not Enough Money to send your mail!");
 	                    	return true;
 						}
                     }
+<<<<<<< HEAD
 					//if costs are turned off send textmail
 					if(Settings.EnableMailCosts == false){
 						sendText(player, args);
@@ -77,6 +111,70 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 						sendText(player, args);
 						return true;
 					}
+=======
+					if(Settings.EnableMailCosts == false){
+							ItemStack itemStack = new ItemStack(Material.PAPER);
+							ItemMeta itemMeta = itemStack.getItemMeta();
+						
+							itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
+							ArrayList<String> lines = new ArrayList<String>();
+						
+							int count = 0;
+							String currentLine = "";
+						
+							for (int i = 2; i < args.length; i++) {
+								currentLine += args[i] + " ";
+								count += args[i].length() + 1;
+								if (++count >= 20) {
+									count = 0;
+									lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+									currentLine = "";
+								}
+						}
+						
+						if (currentLine != "") {
+							lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);	
+						}
+						
+						itemMeta.setLore(lines);
+						itemStack.setItemMeta(itemMeta);
+						Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+	                  
+						player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+						return true;
+					}
+					if(player.hasPermission(Permissions.COSTS_EXEMPT)){
+						ItemStack itemStack = new ItemStack(Material.PAPER);
+						ItemMeta itemMeta = itemStack.getItemMeta();
+					
+						itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
+						ArrayList<String> lines = new ArrayList<String>();
+					
+						int count = 0;
+						String currentLine = "";
+					
+						for (int i = 2; i < args.length; i++) {
+							currentLine += args[i] + " ";
+							count += args[i].length() + 1;
+							if (++count >= 20) {
+								count = 0;
+								lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+								currentLine = "";
+							}
+					}
+					
+					if (currentLine != "") {
+						lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);	
+					}
+					
+					itemMeta.setLore(lines);
+					itemStack.setItemMeta(itemMeta);
+					Inbox.GetInbox(args[1]).AddItem(itemStack, player);
+                  
+					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+					return true;
+					}
+>>>>>>> master
 				}
 				
 				//create inbox chest
