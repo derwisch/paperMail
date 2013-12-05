@@ -7,6 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 //import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -153,7 +154,18 @@ public class PaperMailGUI {
 			}
 			if (CraftStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
 				BookMeta bookMeta = (BookMeta)itemMeta;
-				playerName = bookMeta.getTitle();
+				Player p = Bukkit.getPlayer(bookMeta.getTitle());
+				if (p != null) {
+					playerName = p.getName();
+				    } else {
+				    OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
+				    if (op != null) {
+				    	playerName = op.getName();
+				        } else {
+				        	playerName = bookMeta.getTitle();
+				        	player.sendMessage(ChatColor.DARK_RED + "Player "  + playerName + " may not exist or doesn't have an Inbox yet. Creating Inbox for player " + playerName + ChatColor.RESET);
+				        }
+				    }
 			}
 		}
 			Inbox inbox = Inbox.GetInbox(playerName);

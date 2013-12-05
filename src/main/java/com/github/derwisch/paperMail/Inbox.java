@@ -41,6 +41,7 @@ public class Inbox {
 				return inbox;
 			}
 		}
+		//if player does not yet exist or have an inbox
 		AddInbox(playerName);
 		return GetInbox(playerName);
 	}

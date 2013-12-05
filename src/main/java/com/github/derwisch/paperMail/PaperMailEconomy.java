@@ -4,11 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.meta.BookMeta;
 
 
 public class PaperMailEconomy{
@@ -52,7 +47,7 @@ public class PaperMailEconomy{
 			  }
 			  }
 	  }
-  
+  //take money from the player
   public static void takeMoney(Double price, Player player){
     if (!(PaperMail.isGoldIngot())) {
 				PaperMail.economy.withdrawPlayer(player.getName(), price.doubleValue());
@@ -67,6 +62,7 @@ public class PaperMailEconomy{
        player.sendMessage(ChatColor.GREEN + "%price% Gold Ingots removed from Inventory!".replace("%price%", sb.append(ChatColor.WHITE)).toString());    
       }
     }
+  //check if player has correct amount of currency, return true if they do, false if they don't
   public static boolean hasMoney(Double price, Player player){
 	  if ((!(PaperMail.isGoldIngot())) && (Settings.EnableMailCosts != false) && (price != 0)) {
 		  if (PaperMail.economy.getBalance(player.getName()) < price.doubleValue()) {
@@ -86,6 +82,3 @@ public class PaperMailEconomy{
 	  return true;
   }
 }
-
-
-

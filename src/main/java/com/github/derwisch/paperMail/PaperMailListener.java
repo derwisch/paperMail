@@ -186,7 +186,7 @@ public class PaperMailListener implements Listener {
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE) {
     		if (cursorItem.getType() == Material.WRITTEN_BOOK) {
 	    		event.setCurrentItem(cursorItem);
-	    		event.setCursor(null);
+	    		event.setCursor(new ItemStack(Material.AIR));
 	    		event.setCancelled(true);
     		} else {
         		event.setCancelled(true);
