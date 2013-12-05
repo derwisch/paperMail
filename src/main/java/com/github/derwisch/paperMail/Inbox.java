@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.server.v1_6_R3.NBTCompressedStreamTools;
-import net.minecraft.server.v1_6_R3.NBTTagCompound;
-import net.minecraft.server.v1_6_R3.NBTTagInt;
-import net.minecraft.server.v1_6_R3.NBTTagList;
+import net.minecraft.server.v1_7_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_7_R1.NBTTagCompound;
+import net.minecraft.server.v1_7_R1.NBTTagInt;
+import net.minecraft.server.v1_7_R1.NBTTagList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,7 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +41,7 @@ public class Inbox {
 				return inbox;
 			}
 		}
+		//if player does not yet exist or have an inbox
 		AddInbox(playerName);
 		return GetInbox(playerName);
 	}
@@ -93,7 +94,7 @@ public class Inbox {
 				e.printStackTrace();
 			}
 		}
-		list = c.getList("inventory");
+		list = c.getList("inventory", 10);
 		
 		c.set("inventory",list);
 		try {
@@ -150,14 +151,14 @@ public class Inbox {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		NBTTagList list = c.getList("inventory");
+		NBTTagList list = c.getList("inventory", 10);
 		CraftItemStack cis = null;
 		for(int n = 0; n < list.size(); n++){
 			  NBTTagCompound item = new NBTTagCompound();
-			  item = (NBTTagCompound) list.get(n);
+			  item = list.get(n);
 			  if(item != null){
 			  int index = item.getInt("index");
-			  net.minecraft.server.v1_6_R3.ItemStack is = net.minecraft.server.v1_6_R3.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
+			  net.minecraft.server.v1_7_R1.ItemStack is = net.minecraft.server.v1_7_R1.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
 			  cis = CraftItemStack.asCraftMirror(is);
 			  if(oldstack != cis){
 			  inventory.setItem(index,cis);
@@ -189,15 +190,15 @@ public class Inbox {
 		for(int index = 0; index < inventory.getContents().length; index++){
 			  ItemStack cis = inventory.getItem(index);
 			  if((cis!=null)){
-				  net.minecraft.server.v1_6_R3.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
+				  net.minecraft.server.v1_7_R1.ItemStack is = CraftItemStack.asNMSCopy(cis); //net.minecraft.server item stack, not bukkit!
 			    NBTTagCompound itemCompound = new NBTTagCompound();
 			    itemCompound = is.save(itemCompound);
-			    itemCompound.set("index",new NBTTagInt("index",index));
+			    itemCompound.set("index",new NBTTagInt(index));
 			    list.add(itemCompound);
 			  }
 			  if(cis == null){
 				  NBTTagCompound itemCompound = new NBTTagCompound();
-				  itemCompound.set("index",new NBTTagInt("index",index));
+				  itemCompound.set("index",new NBTTagInt(index));
 				  list.add(itemCompound);
 			  }
 			}
