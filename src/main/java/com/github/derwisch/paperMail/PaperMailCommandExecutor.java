@@ -151,7 +151,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	    OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
 	    if (op != null) {
 	    	playerName = op.getName();
-	    	player.sendMessage(ChatColor.GREEN + "Player " + playerName + " is Offline. Dropping it in they're mailbox!");
+	    	player.sendMessage(ChatColor.GREEN + "Player " + playerName + " is Offline. Dropping it in their mailbox!" + ChatColor.RESET);
 	        } else {
 	        	playerName = args[1];
 	        	player.sendMessage(ChatColor.DARK_RED + "Player "  + playerName + " may not exist or doesn't have an Inbox yet. Creating Inbox for player " + playerName + ChatColor.RESET);
@@ -159,6 +159,6 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	    }
 	Inbox.GetInbox(playerName).AddItem(itemStack, player);
   
-	player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
+	player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + playerName + "!" + ChatColor.RESET);
 	}
 }
