@@ -83,14 +83,7 @@ public class PaperMailListener implements Listener {
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE) {
     		if ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT))){
                 if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
-                    itemMailGUI.Result = SendingGUIClickResult.SEND;
-    	    		itemMailGUI.SendContents();
-    	    		itemMailGUI.close();
-    	    		itemMailGUI.SetClosed();
-    	    		event.setCancelled(true);
-  
-    	        	itemMailGUI = null;
-    	        	PaperMailGUI.RemoveGUI(((Player)inventory.getHolder()).getName());
+                	sendMail(itemMailGUI, event);
             }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
                     player.sendMessage(ChatColor.RED + "Not enough money to send your mail, items not sent!");
                     itemMailGUI.Result = SendingGUIClickResult.CANCEL;
@@ -99,29 +92,20 @@ public class PaperMailListener implements Listener {
             		event.setCancelled(true);
     		}}  
             if((writtenBookBoolean) && (Settings.EnableMailCosts == false)) {
-    			itemMailGUI.Result = SendingGUIClickResult.SEND;
-	    		itemMailGUI.SendContents();
-	    		itemMailGUI.close();
-	    		itemMailGUI.SetClosed();
-	    		event.setCancelled(true);
-	        	itemMailGUI = null;
-	        	PaperMailGUI.RemoveGUI(((Player)inventory.getHolder()).getName());
+            	sendMail(itemMailGUI, event);
     		}
             if (!writtenBookBoolean) {
     			((Player)inventory.getHolder()).sendMessage(ChatColor.RED + "No recipient defined" + ChatColor.RESET);
 	    		event.setCancelled(true);
 	    		}
-            if (player.hasPermission(Permissions.COSTS_EXEMPT)){
-            	itemMailGUI.Result = SendingGUIClickResult.SEND;
-	    		itemMailGUI.SendContents();
-	    		itemMailGUI.close();
-	    		itemMailGUI.SetClosed();
-	    		event.setCancelled(true);
-	        	itemMailGUI = null;
-	        	PaperMailGUI.RemoveGUI(((Player)inventory.getHolder()).getName());
+            if (player.hasPermission(Permissions.COSTS_EXEMPT) && (writtenBookBoolean) && (Settings.EnableMailCosts == true)){
+            	sendMail(itemMailGUI, event);
             }
-    	
-    }}
+            if(player.hasPermission(Permissions.COSTS_EXEMPT) && (writtenBookBoolean)){
+            	sendMail(itemMailGUI, event);
+            }
+    }
+ }
     
     @EventHandler
     public void onInventoryClick_MailGUI_Cancel(InventoryClickEvent event) {
@@ -242,5 +226,14 @@ public class PaperMailListener implements Listener {
         	}
     		
     	}
+    }
+    public void sendMail(PaperMailGUI itemMailGUI, InventoryClickEvent event){
+    	itemMailGUI.Result = SendingGUIClickResult.SEND;
+		itemMailGUI.SendContents();
+		itemMailGUI.close();
+		itemMailGUI.SetClosed();
+		event.setCancelled(true);
+    	itemMailGUI = null;
+    	PaperMailGUI.RemoveGUI(((Player)inventory.getHolder()).getName());
     }
 }
