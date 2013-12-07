@@ -158,7 +158,7 @@ public class PaperMailGUI {
 				if (p != null) {
 					playerName = p.getName();
 				    } else {
-				    OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
+				    OfflinePlayer op = Bukkit.getOfflinePlayer(bookMeta.getTitle());
 				    if (op != null) {
 				    	playerName = op.getName();
 				        } else {
