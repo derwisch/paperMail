@@ -163,11 +163,13 @@ public class PaperMailListener implements Listener {
     	ItemStack currentItem = event.getCurrentItem();
     	ItemStack cursorItem = event.getCursor();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
-
+    	Player player = (Player) event.getView().getPlayer();
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE) {
+    		event.setCurrentItem(null);
     		if (cursorItem.getType() == Material.WRITTEN_BOOK) {
-	    		event.setCurrentItem(cursorItem);
+    			event.setCurrentItem(cursorItem);
 	    		event.setCursor(new ItemStack(Material.AIR));
+	    		player.updateInventory();
 	    		event.setCancelled(true);
     		} else {
         		event.setCancelled(true);
@@ -197,7 +199,8 @@ public class PaperMailListener implements Listener {
 		    					(itemMeta.getDisplayName() == PaperMailGUI.CANCEL_BUTTON_TITLE ||
 		    					itemMeta.getDisplayName() == PaperMailGUI.ENDERCHEST_BUTTON_TITLE ||
 		    					itemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE ||
-		    					itemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE)) {
+		    					itemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE ||
+		    					itemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE)) {
 		    				continue;
 		    			}
 		    			world.dropItemNaturally(playerLocation, itemStack);    			

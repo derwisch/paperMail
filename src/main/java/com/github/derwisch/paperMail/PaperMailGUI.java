@@ -148,6 +148,7 @@ public class PaperMailGUI {
 			if (itemMeta.getDisplayName() != SEND_BUTTON_ON_TITLE && 
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
 				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE &&
+				itemMeta.getDisplayName() != RECIPIENT_TITLE &&
 				CraftStack.getType() != Material.WRITTEN_BOOK) {
 				sendingContents.add(CraftStack);
 				numItems = numItems + CraftStack.getAmount();
