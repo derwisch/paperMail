@@ -1,5 +1,6 @@
 package com.github.derwisch.paperMail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -9,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -61,7 +63,12 @@ public class PaperMail extends JavaPlugin {
     
 	@Override
     public void onDisable() {
-		Inbox.SaveAll();
+		try {
+			Inbox.SaveAll();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Settings.SaveConfiguration(configuration);
 		this.saveConfig();
     	getLogger().info("Disabled PaperMail");
@@ -90,7 +97,15 @@ public class PaperMail extends JavaPlugin {
 			if (player == null) {
 				continue;
 			}
-			Inbox.AddInbox(player.getName());
+			try {
+				Inbox.AddInbox(player.getName());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		for (OfflinePlayer offPlayer : getServer().getOfflinePlayers()) {
 			
@@ -99,7 +114,15 @@ public class PaperMail extends JavaPlugin {
 			if (player == null) {
 				continue;
 			}
-			Inbox.AddInbox(player.getName());
+			try {
+				Inbox.AddInbox(player.getName());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
     

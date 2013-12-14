@@ -1,5 +1,6 @@
 package com.github.derwisch.paperMail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
@@ -11,6 +12,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -81,12 +83,28 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 				
 				//create inbox chest
 				if (args[0].toLowerCase().equals("createbox")) {
-					Inbox inbox;
+					Inbox inbox = null;
 					
 					if (args.length == 1 && (player.hasPermission(Permissions.CREATE_CHEST_SELF_PERM)  || player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM))) {
-						inbox = Inbox.GetInbox(player.getName());
+						try {
+							inbox = Inbox.GetInbox(player.getName());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InvalidConfigurationException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					} else if (args.length == 2 && player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)) {
-						inbox = Inbox.GetInbox(args[1]);
+						try {
+							inbox = Inbox.GetInbox(args[1]);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InvalidConfigurationException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					} else {
 						player.sendMessage(ChatColor.DARK_RED + "Too many arguments!" + ChatColor.RESET);
 						return true;
@@ -157,7 +175,15 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	        	player.sendMessage(ChatColor.DARK_RED + "Player "  + playerName + " may not exist or doesn't have an Inbox yet. Creating Inbox for player " + playerName + ChatColor.RESET);
 	        }
 	    }
-	Inbox.GetInbox(playerName).AddItem(itemStack, player);
+	try {
+		Inbox.GetInbox(playerName).AddItem(itemStack, player);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (InvalidConfigurationException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
   
 	player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + playerName + "!" + ChatColor.RESET);
 	}

@@ -1,5 +1,6 @@
 package com.github.derwisch.paperMail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
+import org.bukkit.configuration.InvalidConfigurationException;
 //import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -132,7 +133,7 @@ public class PaperMailGUI {
 		Player.closeInventory();
 	}
 	
-	public void SendContents() {
+	public void SendContents() throws IOException, InvalidConfigurationException {
 		Player player = this.Player;
 		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
 		String playerName = "";

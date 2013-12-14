@@ -3,19 +3,26 @@ package com.github.derwisch.paperMail;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+
 //    minecraft internals
 import net.minecraft.server.v1_7_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_7_R1.NBTTagCompound;
 import net.minecraft.server.v1_7_R1.NBTTagList;
+
+
 //    bukkit/craftbukkit imports
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -25,13 +32,13 @@ public class Inbox {
 	
 	public static ArrayList<Inbox> Inboxes = new ArrayList<Inbox>();
 	
-	public static void SaveAll() {
+	public static void SaveAll() throws IOException {
 		for (Inbox inbox : Inboxes) {
 			inbox.SaveInbox();
 		}
 	}
 	
-	public static Inbox GetInbox(String playerName) {
+	public static Inbox GetInbox(String playerName) throws IOException, InvalidConfigurationException {
 		for (Inbox inbox : Inboxes) {
 			if (inbox.playerName.equals(playerName)) {
 				return inbox;
@@ -42,7 +49,7 @@ public class Inbox {
 		return GetInbox(playerName);
 	}
 	
-	public static void AddInbox(String playerName) {
+	public static void AddInbox(String playerName) throws IOException, InvalidConfigurationException {
 		if (!Settings.InboxPlayers.contains(playerName)) {
 			Settings.InboxPlayers.add(playerName);
 		}
@@ -65,14 +72,17 @@ public class Inbox {
 	private NBTTagCompound c = new NBTTagCompound();
 	private FileConfiguration playerConfig;
 	private ConfigAccessor configAccessor;
-	private File file; 
-	public Inbox(String playerName) {
+	private File file;
+	private File yamlfile;
+	public Inbox(String playerName) throws IOException, InvalidConfigurationException {
 		this.playerName = playerName;
 		String filename = playerName + ".txt";
+		String yamlname = playerName + ".yml";
 		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + playerName + ".yml");
 		this.playerConfig = configAccessor.getConfig();
 		configAccessor.saveConfig();
 		file = new File(PaperMail.instance.getDataFolder(), "players\\" + filename);
+		yamlfile = new File(PaperMail.instance.getDataFolder(), "players\\" + yamlname);
 		configAccessor.saveConfig();
 		initMailBox();
 		loadChest();
@@ -97,13 +107,15 @@ public class Inbox {
 		inboxChest = (block != null && block.getType() == Material.CHEST) ? (Chest)block.getState() : null; 
 	}
 	
-	private void loadItems() {
+	private void loadItems() throws IOException, InvalidConfigurationException {
 		int i = 0;
 		ItemStack oldstack = null;
 		ItemStack stack = null;
 		String itemString = null;
+		YamlConfiguration yaml = new Utf8YamlConfiguration();
+		yaml.load(yamlfile);
 		do {
-		      itemString = this.playerConfig.getString("newitemstack." + i);
+		      itemString = yaml.getString("newitemstack." + i);
 		      if (itemString != null) {
 		        stack = InventoryUtils.stringToItemStack(itemString);
 		      }
@@ -112,6 +124,7 @@ public class Inbox {
 		      }
 		      i++;
 		    }while ((stack != null) && (itemString != null));
+		i = 0;
 		do {
 			oldstack = playerConfig.getItemStack("itemstack." + i);
 			if (oldstack != null){
@@ -147,7 +160,6 @@ public class Inbox {
 				  {
 					if(oldstack != cis){
 						inventory.setItem(index,cis);
-						
 				  	 }
 				  }
 			 }
@@ -172,21 +184,21 @@ public class Inbox {
 		 configAccessor.saveConfig();
 	}
 	
-	private void saveItems() {
+	private void saveItems() throws IOException {
+		YamlConfiguration yaml = new Utf8YamlConfiguration();
 		for (int i = 0; i < Settings.DefaultBoxRows * 9; i++) {
 		      CraftItemStack stack = (CraftItemStack)this.inventory.getItem(i);
 		      if (stack != null) {
 		        String item = InventoryUtils.itemstackToString(stack);
-		        this.playerConfig.set("newitemstack." + i, item);
+		        yaml.set("newitemstack." + i, item);
 		      }
 		      if (stack == null)
 		      {
 		        String item = null;
-		        this.playerConfig.set("newitemstack." + i, item);
+		        yaml.set("newitemstack." + i, item);
 		      }
 		    }
-
-		    this.configAccessor.saveConfig();
+		yaml.save(yamlfile);
 	}
 	
 	public void openInbox() {
@@ -200,7 +212,7 @@ public class Inbox {
 		saveChest();
 	}
 	
-	public void AddItem(ItemStack itemStack, Player sender) {
+	public void AddItem(ItemStack itemStack, Player sender) throws IOException {
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		if (inboxChest != null) {
 			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
@@ -227,13 +239,20 @@ public class Inbox {
 		saveItems();
 	}
 	
-	public void AddItems(Collection<ItemStack> items, Player sender) {
+	public void AddItems(Collection<ItemStack> items, Player sender) throws IOException {
 		for (ItemStack itemStack : items) {
 			AddItem(itemStack, sender);
 		}
 	}
+	
+	public static String loadStringFromYaml(File file,int index) throws IOException, InvalidConfigurationException {
+		YamlConfiguration yaml = new Utf8YamlConfiguration();
+		yaml.load(file);
+		String item = yaml.getString("newitemstack." + index);
+		return item;
+	}
 
-	public void SaveInbox() {
+	public void SaveInbox() throws IOException {
 		saveItems();
 		saveChest();
 	}

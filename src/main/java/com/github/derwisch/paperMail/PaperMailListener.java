@@ -1,11 +1,14 @@
 package com.github.derwisch.paperMail;
 
+import java.io.IOException;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
@@ -21,7 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class PaperMailListener implements Listener {
 	
     @EventHandler
-    public void playerJoin(PlayerJoinEvent event) {
+    public void playerJoin(PlayerJoinEvent event) throws IOException, InvalidConfigurationException {
 		Inbox inbox = Inbox.GetInbox(event.getPlayer().getName());
 		if (inbox == null) {
 			Inbox.AddInbox(event.getPlayer().getName());
@@ -44,7 +47,16 @@ public class PaperMailListener implements Listener {
                 if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 	new PaperMailGUI(player).Show();
                 } else if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                	Inbox inbox = Inbox.GetInbox(player.getName());
+                	Inbox inbox = null;
+					try {
+						inbox = Inbox.GetInbox(player.getName());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvalidConfigurationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 	inbox.openInbox();
                 	event.setCancelled(true);
                 }
@@ -53,7 +65,7 @@ public class PaperMailListener implements Listener {
     }
     
     @EventHandler
-    public void onInventoryClick_MailGUI_Send(InventoryClickEvent event) {
+    public void onInventoryClick_MailGUI_Send(InventoryClickEvent event) throws IOException, InvalidConfigurationException {
     	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
     	double ItemCost = Settings.ItemCost;
@@ -178,7 +190,7 @@ public class PaperMailListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
+    public void onInventoryClose(InventoryCloseEvent event) throws IOException, InvalidConfigurationException {
     	Inventory inventory = event.getInventory();
     	
     	if (inventory.getName() == PaperMail.NEW_MAIL_GUI_TITLE) {
@@ -227,7 +239,7 @@ public class PaperMailListener implements Listener {
     		
     	}
     }
-    public void sendMail(PaperMailGUI itemMailGUI, InventoryClickEvent event, Inventory inventory){
+    public void sendMail(PaperMailGUI itemMailGUI, InventoryClickEvent event, Inventory inventory) throws IOException, InvalidConfigurationException{
     	itemMailGUI.Result = SendingGUIClickResult.SEND;
 		itemMailGUI.SendContents();
 		itemMailGUI.close();
