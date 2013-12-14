@@ -25,8 +25,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class InventoryUtils{
-
+public class InventoryUtils
+{
 	private static String versionPrefix = "";
 
 	private static Class<?> class_ItemStack;
@@ -49,6 +49,7 @@ public class InventoryUtils{
 
 			class_ItemStack = fixBukkitClass("net.minecraft.server.ItemStack");
 			class_NBTBase = fixBukkitClass("net.minecraft.server.NBTBase");
+			fixBukkitClass("net.minecraft.server.NBTCompressedStreamTools");
 			class_NBTTagCompound = fixBukkitClass("net.minecraft.server.NBTTagCompound");
 			class_NBTTagList = fixBukkitClass("net.minecraft.server.NBTTagList");
 			class_CraftInventoryCustom = fixBukkitClass("org.bukkit.craftbukkit.inventory.CraftInventoryCustom");
@@ -171,7 +172,7 @@ public class InventoryUtils{
 		try {
 			final NBTTagList itemList = new NBTTagList();
 			for (int i = 0; i < inventory.getSize(); i++) {
-				final NBTTagCompound outputObject = new NBTTagCompound(); 
+				final NBTTagCompound outputObject = new NBTTagCompound();
 				Object craft = null;
 				final CraftItemStack is = (CraftItemStack) inventory.getItem(i);
 				if (is != null) {
@@ -198,41 +199,59 @@ public class InventoryUtils{
 		return new BigInteger(1, outputStream.toByteArray()).toString(32);
 	}
 
-	public static Inventory stringToInventory(final String data) {
+	public static Inventory stringToInventory(final String data)  throws Exception {
 		Inventory inventory = null;
 
 		try {
-			final ByteArrayInputStream dataInput = new ByteArrayInputStream(new BigInteger(data, 32).toByteArray());
+			final ByteArrayInputStream dataInput = new ByteArrayInputStream(
+					new BigInteger(data, 32).toByteArray());
 			final InputStream inputStream = new DataInputStream(dataInput);
-			
+
 			// More MC internals :(
-			final NBTTagCompound itemList = NBTCompressedStreamTools.a(inputStream);
+			final NBTTagCompound tagCompound = NBTCompressedStreamTools
+					.a(inputStream);
 
-			NBTTagList newlist = itemList.getList("Items", 10);
-			final int listSize = newlist.size();
+			NBTTagList itemList = tagCompound.getList("Items", 10);
 
-			inventory = createInventory(null, listSize);
-			if (itemList.hasKey("Items")) {
-                NBTTagList list = itemList.getList("Items", 10);
-
-                for (int i = 0; i < list.size(); i++) {
-                        NBTTagCompound tag2 = (NBTTagCompound) list.get(i);
-
-                        int slot = tag2.getByte("Slot") & 0xFF;
-                        if (slot < inventory.getSize()) {
-                            net.minecraft.server.v1_7_R1.ItemStack item = net.minecraft.server.v1_7_R1.ItemStack.createStack(tag2);
-                            CraftItemStack is = CraftItemStack.asCraftMirror(item);
-                        	inventory.setItem(slot, is);
-                        }
-                }
+			//-----------------------------------------------------------------
+			// create inventory
+			//-----------------------------------------------------------------
+			// TODO: fix this monkey patch!
+			// get max slot number = max of inventory
+			int maxSlot = 0;
+			for (int i = 0; i < itemList.size(); i++) {
+				int tmp = itemList.get(i).getByte("Slot") & 0xFF;
+				if(maxSlot < tmp){
+					maxSlot = tmp;
+				}
 			}
-		} catch (Throwable ex) {
-			ex.printStackTrace();
+			inventory = createInventory(null, maxSlot+1);
+
+			for (int i = 0; i < itemList.size(); i++) {
+				NBTTagCompound tmpTagCompound = itemList.get(i);
+				int slot = tmpTagCompound.getByte("Slot") & 0xFF;
+				//System.out.println("slot="+slot+" ,inventory.getsize="+inventory.getSize());
+
+				if(slot >= 0 && slot < inventory.getSize()){
+					net.minecraft.server.v1_7_R1.ItemStack itemStack = net.minecraft.server.v1_7_R1.ItemStack
+							.createStack(tmpTagCompound);
+
+					CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(itemStack);
+					inventory.setItem(slot, craftItemStack);
+				}
+			}
+			//-----------------------------------------------------------------
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception(
+					"Sorry, your inventory isn't compatible with this version. Clear and create new one.");
 		}
+
 		return inventory;
 	}
-	
-	static public String itemstackToString(ItemStack is) {
+
+	public static String itemstackToString(ItemStack is) {
 		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		final OutputStream dataOutput = new DataOutputStream(outputStream);
 		NBTTagCompound outputObject = new NBTTagCompound();
@@ -243,7 +262,7 @@ public class InventoryUtils{
 		return new BigInteger(1, outputStream.toByteArray()).toString(32);
 		}
 
-	static public ItemStack stringToItemStack(String str) {
+	public static ItemStack stringToItemStack(String str) {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(str, 32).toByteArray());
 		NBTTagCompound item = NBTCompressedStreamTools.a(inputStream);
 		net.minecraft.server.v1_7_R1.ItemStack stack = net.minecraft.server.v1_7_R1.ItemStack.createStack(item);
@@ -271,6 +290,7 @@ public class InventoryUtils{
 		}
 		return false;
 	}
+
 	private static CraftItemStack getCraftVersion(ItemStack stack) {
         if (stack instanceof CraftItemStack)
             return (CraftItemStack) stack;
@@ -291,7 +311,9 @@ public class InventoryUtils{
         }
         return inventory;
     }
-    
+
+   // ---------------------------------
+   
     /*Check if there is enough space in Inventory to store item*/
     public static boolean inventoryCheck(Inventory inv, ItemStack is) {    
 		ItemStack itemToAdd = is;
@@ -309,13 +331,11 @@ public class InventoryUtils{
 		} else {
 			return false;
 			//Don't add the item, Inventory is full
-}
-}
+	}
+	}
 
     public static boolean inventoryCheck(Player player, ItemStack is){
     	return inventoryCheck(player.getInventory(), is);
-}
-
-
+	}
 
 }
