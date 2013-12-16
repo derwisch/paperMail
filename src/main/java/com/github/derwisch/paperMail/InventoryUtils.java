@@ -165,7 +165,8 @@ public class InventoryUtils
 			ex.printStackTrace();
 		}
     }
-
+	
+	//Save an entire inventory to a serialized string
 	public static String inventoryToString(final Inventory inventory) {
 		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		final OutputStream dataOutput = new DataOutputStream(outputStream);
@@ -198,7 +199,8 @@ public class InventoryUtils
 
 		return new BigInteger(1, outputStream.toByteArray()).toString(32);
 	}
-
+	
+	//Load an entire Inventory from a serialized string
 	public static Inventory stringToInventory(final String data)  throws Exception {
 		Inventory inventory = null;
 
@@ -250,7 +252,8 @@ public class InventoryUtils
 
 		return inventory;
 	}
-
+	
+	//Turns an itemstack into a serialized string
 	public static String itemstackToString(ItemStack is) {
 		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		final OutputStream dataOutput = new DataOutputStream(outputStream);
@@ -261,7 +264,8 @@ public class InventoryUtils
 		NBTCompressedStreamTools.a(outputObject, dataOutput);
 		return new BigInteger(1, outputStream.toByteArray()).toString(32);
 		}
-
+	
+	//Turns a serialized string into an itemstack
 	public static ItemStack stringToItemStack(String str) {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(str, 32).toByteArray());
 		NBTTagCompound item = NBTCompressedStreamTools.a(inputStream);
@@ -290,8 +294,9 @@ public class InventoryUtils
 		}
 		return false;
 	}
-
-	private static CraftItemStack getCraftVersion(ItemStack stack) {
+	
+	//Returns a CraftItemStack version of a bukkit ItemStack
+	public static CraftItemStack getCraftVersion(ItemStack stack) {
         if (stack instanceof CraftItemStack)
             return (CraftItemStack) stack;
         else if (stack != null)

@@ -112,6 +112,7 @@ public class Inbox {
 		ItemStack oldstack = null;
 		ItemStack stack = null;
 		String itemString = null;
+		//Load Current stack save format
 		YamlConfiguration yaml = new Utf8YamlConfiguration();
 		yaml.load(yamlfile);
 		do {
@@ -125,6 +126,7 @@ public class Inbox {
 		      i++;
 		    }while ((stack != null) && (itemString != null));
 		i = 0;
+		//Load old old stacks for conversion, set slots to empty after load
 		do {
 			oldstack = playerConfig.getItemStack("itemstack." + i);
 			if (oldstack != null){
@@ -136,6 +138,7 @@ public class Inbox {
 			}
 			i++;
 		} while (oldstack != null);
+		//Load old stacks for conversion, delete the username.txt if any found after load
 		if(file.exists())
 		{	
 			try {
@@ -244,12 +247,18 @@ public class Inbox {
 			AddItem(itemStack, sender);
 		}
 	}
-	
-	public static String loadStringFromYaml(File file,int index) throws IOException, InvalidConfigurationException {
+	//Loads a string from a yaml file with a section name(string) and index number(int)
+	public static String loadStringFromYaml(File file,int index, String section) throws IOException, InvalidConfigurationException {
 		YamlConfiguration yaml = new Utf8YamlConfiguration();
 		yaml.load(file);
-		String item = yaml.getString("newitemstack." + index);
+		String item = yaml.getString(section + index);
 		return item;
+	}
+	//Saves a string to a yaml file with a section name(string) and index number(int)
+	public static void saveStringtoYaml(File file, int index, String str, String section) throws IOException, InvalidConfigurationException {
+		YamlConfiguration yaml = new Utf8YamlConfiguration();
+		yaml.set(section + index, str);
+		yaml.save(file);
 	}
 
 	public void SaveInbox() throws IOException {
