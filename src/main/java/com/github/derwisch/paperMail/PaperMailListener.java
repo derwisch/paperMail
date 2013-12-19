@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -18,6 +19,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
  
@@ -212,7 +214,8 @@ public class PaperMailListener implements Listener {
 		    					itemMeta.getDisplayName() == PaperMailGUI.ENDERCHEST_BUTTON_TITLE ||
 		    					itemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE ||
 		    					itemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE ||
-		    					itemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE)) {
+		    					itemMeta.getDisplayName() == PaperMailGUI.RECIPIENT_TITLE) ||
+		    					itemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) {
 		    				continue;
 		    			}
 		    			world.dropItemNaturally(playerLocation, itemStack);    			
@@ -239,6 +242,31 @@ public class PaperMailListener implements Listener {
     		
     	}
     }
+    
+    @SuppressWarnings("deprecation")
+	@EventHandler
+    public void onInventoryClick_MailGUI_sendMoney(InventoryClickEvent event) {
+    	Inventory inv = event.getInventory();
+    	Player player = ((Player)inv.getHolder());
+    	ItemStack currentItem = event.getCurrentItem();
+    	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
+    	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
+    		return;
+    	if ((inv.getName() != null) && (inv.getName() == PaperMail.NEW_MAIL_GUI_TITLE)) {
+    		if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) {
+    			if(currentItem.getAmount() == 0){
+    				currentItem.setAmount(1);
+    			}else{
+    			currentItem.setAmount(currentItem.getAmount() + Settings.Increments);
+    			}
+    			player.updateInventory();           
+    			event.setCancelled(true);
+    		}
+    	}
+    }
+    
+    //Create Method On Right Click Item Bank Note Deposit
+    
     public void sendMail(PaperMailGUI itemMailGUI, InventoryClickEvent event, Inventory inventory) throws IOException, InvalidConfigurationException{
     	itemMailGUI.Result = SendingGUIClickResult.SEND;
 		itemMailGUI.SendContents();

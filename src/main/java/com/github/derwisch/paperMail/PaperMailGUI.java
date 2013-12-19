@@ -23,6 +23,8 @@ public class PaperMailGUI {
 	public static final String SEND_BUTTON_ON_TITLE = ChatColor.WHITE + "Send" + ChatColor.RESET;
 	public static final String CANCEL_BUTTON_TITLE = ChatColor.WHITE + "Cancel" + ChatColor.RESET;
 	public static final String ENDERCHEST_BUTTON_TITLE = ChatColor.WHITE + "Open Enderchest" + ChatColor.RESET;
+	public static final String MONEY_SEND_BUTTON_TITLE = ChatColor.WHITE + "Send Money" + ChatColor.RESET;
+	public static final String BANK_NOTE_DISPLAY = ChatColor.GREEN + "Bank Note";
 	
 	private static ArrayList<PaperMailGUI> itemMailGUIs = new ArrayList<PaperMailGUI>();
 	private static Map<String, PaperMailGUI> openGUIs = new HashMap<String, PaperMailGUI>();
@@ -35,6 +37,7 @@ public class PaperMailGUI {
 	private ItemStack sendButtonEnabled;
 	private ItemStack cancelButton; 
 	private ItemStack enderChestButton;
+	private ItemStack sendMoneyButton;
 	private boolean paperSent;
 	
 	public SendingGUIClickResult Result = SendingGUIClickResult.CANCEL;
@@ -69,6 +72,7 @@ public class PaperMailGUI {
 		sendButtonEnabled = new ItemStack(Material.WOOL);
 		cancelButton = new ItemStack(Material.WOOL);
 		enderChestButton = new ItemStack(Material.ENDER_CHEST);
+		sendMoneyButton = new ItemStack(Material.GOLD_INGOT);
 
     	sendButtonEnabled.setDurability((short)5);
     	cancelButton.setDurability((short)14);
@@ -77,10 +81,12 @@ public class PaperMailGUI {
     	ItemMeta sendButtonEnabledMeta = sendButtonEnabled.getItemMeta();
     	ItemMeta cancelButtonMeta = cancelButton.getItemMeta();
     	ItemMeta enderChestButtonMeta = enderChestButton.getItemMeta();
+    	ItemMeta sendMoneyButtonMeta = sendMoneyButton.getItemMeta();
     	
     	ArrayList<String> recipientMessageLore = new ArrayList<String>();
     	ArrayList<String> sendButtonDisabledLore = new ArrayList<String>();
     	ArrayList<String> enderChestButtonLore = new ArrayList<String>();
+    	ArrayList<String> sendMoneyButtonLore = new ArrayList<String>();
 
     	recipientMessageLore.add(ChatColor.GRAY + "Add a written book named" + ChatColor.RESET);
     	recipientMessageLore.add(ChatColor.GRAY + "like a player to define" + ChatColor.RESET);
@@ -94,6 +100,11 @@ public class PaperMailGUI {
     	enderChestButtonLore.add(ChatColor.GRAY + "You return to the mail after" + ChatColor.RESET);
     	enderChestButtonLore.add(ChatColor.GRAY + "closing the enderchest" + ChatColor.RESET);
     	
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "Clicking this button will" + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "increase the amount of money" + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "(if any) that you wish to" + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "send by increments of " + Settings.Increments + ChatColor.RESET);
+    	
     	recipientMessageMeta.setDisplayName(RECIPIENT_TITLE);
     	recipientMessageMeta.setLore(recipientMessageLore);
 
@@ -103,11 +114,15 @@ public class PaperMailGUI {
     	
     	enderChestButtonMeta.setDisplayName(ENDERCHEST_BUTTON_TITLE);
     	enderChestButtonMeta.setLore(enderChestButtonLore);
+    	
+    	sendMoneyButtonMeta.setDisplayName(MONEY_SEND_BUTTON_TITLE);
+    	sendMoneyButtonMeta.setLore(sendMoneyButtonLore);
 
     	recipientMessage.setItemMeta(recipientMessageMeta);
     	sendButtonEnabled.setItemMeta(sendButtonEnabledMeta);
     	cancelButton.setItemMeta(cancelButtonMeta);
     	enderChestButton.setItemMeta(enderChestButtonMeta);
+    	sendMoneyButton.setItemMeta(sendMoneyButtonMeta);
 
     	Inventory.setItem(0, recipientMessage);
     	if (Settings.EnableEnderchest) {
@@ -115,6 +130,13 @@ public class PaperMailGUI {
     	}
     	Inventory.setItem(((Settings.MailWindowRows - 1) * 9) - 1, sendButtonEnabled);
     	Inventory.setItem((Settings.MailWindowRows * 9) - 1, cancelButton);
+    	if (Settings.EnableSendMoney == true){
+    		if(Settings.MailWindowRows > 3){
+    		Inventory.setItem(((Settings.MailWindowRows - 2) * 9) -1, sendMoneyButton);
+    		}else{
+    			Inventory.setItem(7, sendMoneyButton);
+    		}
+    	}
 	}
 	
 	public void Show() {
@@ -133,6 +155,7 @@ public class PaperMailGUI {
 		Player.closeInventory();
 	}
 	
+	@SuppressWarnings("null")
 	public void SendContents() throws IOException, InvalidConfigurationException {
 		Player player = this.Player;
 		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
@@ -150,7 +173,8 @@ public class PaperMailGUI {
 				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
 				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE &&
 				itemMeta.getDisplayName() != RECIPIENT_TITLE &&
-				CraftStack.getType() != Material.WRITTEN_BOOK) {
+				CraftStack.getType() != Material.WRITTEN_BOOK &&
+				itemMeta.getDisplayName() != MONEY_SEND_BUTTON_TITLE) {
 				sendingContents.add(CraftStack);
 				numItems = numItems + CraftStack.getAmount();
 			}
@@ -169,13 +193,27 @@ public class PaperMailGUI {
 				        }
 				    }
 			}
+			//If Sending Money is enabled, count the amount the player wants to send and convert it to Bank Note.
+			if((itemMeta.getDisplayName() == MONEY_SEND_BUTTON_TITLE) && (Settings.EnableSendMoney == true)){
+				if (CraftStack.getAmount() != 0){
+				double amount = CraftStack.getAmount();
+				if(PaperMailEconomy.hasMoney(amount, player) == true){
+					CraftStack = PaperMailEconomy.getBankNote(amount, player);
+					sendingContents.add(CraftStack);
+				}else{
+					player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have!" + ChatColor.RESET);
+				}
+				}
+			}
 		}
 			Inbox inbox = Inbox.GetInbox(playerName);
 			inbox.AddItems(sendingContents, Player);	
+		//Take the money for each item sent if PerItemCosts is enabled
 		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
 			itemCost = numItems * Settings.ItemCost;
 			PaperMailEconomy.takeMoney(itemCost, player);
 		}
+		//Take the Item Mailing fee if PerItemCosts is disabled
 		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == false) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
 			PaperMailEconomy.takeMoney(itemCost, player);
 		}
@@ -194,7 +232,4 @@ public class PaperMailGUI {
 		}
 		return null;
 	}
-	
-	
-	
 }

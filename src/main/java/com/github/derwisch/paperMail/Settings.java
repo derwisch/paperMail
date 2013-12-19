@@ -13,6 +13,7 @@ public class Settings {
 	public static boolean EnableEnderchest = true;
 	public static boolean EnableMailCosts = false;
 	public static boolean PerItemCosts = false;
+	public static boolean EnableSendMoney = false;
 
 	public static int MailWindowRows = 3;
 	public static int DefaultBoxRows = 4;
@@ -24,6 +25,7 @@ public class Settings {
 	public static double ItemCost = 0;
 	public static int MailItemID = 339;
 	public static int MailItemDV = 1;
+	public static int Increments = 0;
 	public static String MailItemName = "Letter paper";
 	
 	public static List<String> InboxPlayers = new ArrayList<String>();
@@ -38,9 +40,11 @@ public class Settings {
         	EnableEnderchest = config.getBoolean("general.EnableEnderchest");
         	EnableMailCosts = config.getBoolean("general.EnableMailCosts");
         	PerItemCosts = config.getBoolean("general.EnablePerItemCosts");
+        	EnableSendMoney = config.getBoolean("general.EnableSendMoney");
         	
         	Price = config.getDouble("general.CostToText");
         	ItemCost = config.getDouble("general.SendItemCost");
+        	Increments = config.getInt("general.Increments");
 
         	MailItemID = config.getInt("general.MailItemID");
         	MailItemDV = config.getInt("general.MailItemDV");
@@ -61,9 +65,11 @@ public class Settings {
     	config.set("general.EnableEnderchest", EnableEnderchest);
     	config.set("general.EnableMailCosts", EnableMailCosts);
     	config.set("general.EnablePerItemCosts", PerItemCosts);
+    	config.set("general.EnableSendMoney", EnableSendMoney);
     	
     	config.set("general.CostToText", Price);
     	config.set("general.SendItemCost", ItemCost);
+    	config.set("general.Increments", Increments);
     	
     	config.set("general.MailItemID", MailItemID);
     	config.set("general.MailItemDV", MailItemDV);

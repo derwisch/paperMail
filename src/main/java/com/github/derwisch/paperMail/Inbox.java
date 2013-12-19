@@ -187,6 +187,7 @@ public class Inbox {
 		 configAccessor.saveConfig();
 	}
 	
+	//Save all items in the recipients or user's Papermail inbox inventory to yaml
 	private void saveItems() throws IOException {
 		YamlConfiguration yaml = new Utf8YamlConfiguration();
 		for (int i = 0; i < Settings.DefaultBoxRows * 9; i++) {

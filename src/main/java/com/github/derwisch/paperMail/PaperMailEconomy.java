@@ -1,9 +1,12 @@
 package com.github.derwisch.paperMail;
 
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 
 public class PaperMailEconomy{
@@ -81,4 +84,21 @@ public class PaperMailEconomy{
 	  hasMoney = true;
 	  return true;
   }
+  
+//Converts an amount of a player's money into a custom Bank Note Item
+  public static ItemStack getBankNote(double amount, Player player){
+		ItemStack bankNote = new ItemStack(Material.PAPER); 
+		String BANK_NOTE_NAME = PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RED +  ")" + ChatColor.RESET;
+		ItemMeta bankNoteMeta = bankNote.getItemMeta();
+		ArrayList<String> bankNoteLore = new ArrayList<String>();
+		bankNoteLore.add(ChatColor.GRAY + "Right Click this Bank");
+		bankNoteLore.add(ChatColor.GRAY + "Note to deposit the sum");
+		bankNoteLore.add(ChatColor.GRAY + "into your Account");
+		bankNoteLore.add(ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RESET);
+		bankNoteMeta.setDisplayName(BANK_NOTE_NAME);
+		bankNoteMeta.setLore(bankNoteLore);
+		bankNote.setItemMeta(bankNoteMeta);
+		PaperMailEconomy.takeMoney(amount, player);
+		return bankNote;
+	}
 }
