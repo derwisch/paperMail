@@ -25,6 +25,8 @@ import org.bukkit.inventory.meta.ItemMeta;
  
 public class PaperMailListener implements Listener {
 	
+	public double sendAmount = 0;
+	
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) throws IOException, InvalidConfigurationException {
 		Inbox inbox = Inbox.GetInbox(event.getPlayer().getName());
@@ -79,6 +81,7 @@ public class PaperMailListener implements Listener {
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
     	ItemStack recipientItem = inventory.getItem(0);
     	boolean writtenBookBoolean = (recipientItem != null && recipientItem.getType() == Material.WRITTEN_BOOK);
+    	boolean cancel = false;
     	for (int i = 0; i < inventory.getSize(); i++) {
     		ItemStack CraftStack = inventory.getItem(i);
     		if (CraftStack != null)
@@ -95,25 +98,44 @@ public class PaperMailListener implements Listener {
     	if(Settings.PerItemCosts == true)
     		ItemCost = numItems * Settings.ItemCost;
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE) {
-    		if ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT))){
+    		if ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && (sendAmount > 1)){
                 if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
-                	sendMail(itemMailGUI, event, inventory);
-            }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
+                	cancel = false;
+                }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
                     player.sendMessage(ChatColor.RED + "Not enough money to send your mail, items not sent!");
                     itemMailGUI.Result = SendingGUIClickResult.CANCEL;
             		itemMailGUI.close();
             		itemMailGUI.SetClosed();
             		event.setCancelled(true);
-    		}}  
-            if((writtenBookBoolean) && (Settings.EnableMailCosts == false)) {
-            	sendMail(itemMailGUI, event, inventory);
+            		cancel = true;
+                }
+            }
+    		if((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1))
+    		{
+    			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have! Sending cancelled!");
+    			itemMailGUI.Result = SendingGUIClickResult.CANCEL;
+        		itemMailGUI.close();
+        		itemMailGUI.SetClosed();
+        		event.setCancelled(true);
+        		cancel = true;
     		}
             if (!writtenBookBoolean) {
     			((Player)inventory.getHolder()).sendMessage(ChatColor.RED + "No recipient defined" + ChatColor.RESET);
-	    		event.setCancelled(true);
+    			itemMailGUI.Result = SendingGUIClickResult.CANCEL;
+        		itemMailGUI.close();
+        		itemMailGUI.SetClosed();
+        		event.setCancelled(true);
+        		cancel = true;
 	    		}
-            if(player.hasPermission(Permissions.COSTS_EXEMPT) && (writtenBookBoolean)){
+            if(writtenBookBoolean && ((Settings.EnableMailCosts == false) || (Settings.ItemCost == 0) || player.hasPermission(Permissions.COSTS_EXEMPT)) && (cancel != true)) {
+            	cancel = false;
+    		}
+            if (cancel != true)
+            {
             	sendMail(itemMailGUI, event, inventory);
+            	itemMailGUI.close();
+        		itemMailGUI.SetClosed();
+        		event.setCancelled(true);
             }
     }
  }
@@ -242,18 +264,18 @@ public class PaperMailListener implements Listener {
     		
     	}
     }
-    
     @SuppressWarnings("deprecation")
 	@EventHandler
     public void onInventoryClick_MailGUI_sendMoney(InventoryClickEvent event) {
     	Inventory inv = event.getInventory();
+    	inv.setMaxStackSize(127);
     	Player player = ((Player)inv.getHolder());
     	ItemStack currentItem = event.getCurrentItem();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
     	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
     	if ((inv.getName() != null) && (inv.getName() == PaperMail.NEW_MAIL_GUI_TITLE)) {
-    		if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) {
+    		if ((currentItemMeta != null) && (currentItemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) && (event.getClick().isLeftClick())) {
     			if(currentItem.getAmount() == 0){
     				currentItem.setAmount(1);
     			}else{
@@ -262,7 +284,17 @@ public class PaperMailListener implements Listener {
     			player.updateInventory();           
     			event.setCancelled(true);
     		}
+    		if ((currentItemMeta != null) && (currentItemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) && (event.getClick().isRightClick())) {
+    			if(currentItem.getAmount() == 0){
+    				currentItem.setAmount(1);
+    			}else{
+    			currentItem.setAmount(currentItem.getAmount() - Settings.Increments);
+    			}
+    			player.updateInventory();
+    			event.setCancelled(true);
+    		}
     	}
+    	sendAmount = currentItem.getAmount();
     }
     
     //Create Method On Right Click Item Bank Note Deposit

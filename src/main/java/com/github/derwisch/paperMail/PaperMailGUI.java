@@ -68,6 +68,7 @@ public class PaperMailGUI {
 	}
 	
 	private void initializeButtons() {
+		Inventory.setMaxStackSize(127);
 		recipientMessage = new ItemStack(Material.PAPER);
 		sendButtonEnabled = new ItemStack(Material.WOOL);
 		cancelButton = new ItemStack(Material.WOOL);
@@ -100,10 +101,14 @@ public class PaperMailGUI {
     	enderChestButtonLore.add(ChatColor.GRAY + "You return to the mail after" + ChatColor.RESET);
     	enderChestButtonLore.add(ChatColor.GRAY + "closing the enderchest" + ChatColor.RESET);
     	
-    	sendMoneyButtonLore.add(ChatColor.GRAY + "Clicking this button will" + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GREEN + "Left-Clicking" + ChatColor.GRAY + " this button will" + ChatColor.RESET);
     	sendMoneyButtonLore.add(ChatColor.GRAY + "increase the amount of money" + ChatColor.RESET);
     	sendMoneyButtonLore.add(ChatColor.GRAY + "(if any) that you wish to" + ChatColor.RESET);
-    	sendMoneyButtonLore.add(ChatColor.GRAY + "send by increments of " + Settings.Increments + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "send by increments of " + Settings.Increments + "." + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.BLUE + "Right-Clicking" + ChatColor.GRAY + " this button will" + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "decrease this amount by " + Settings.Increments + "." + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "Minimum send amount of 2. Max" + ChatColor.RESET);
+    	sendMoneyButtonLore.add(ChatColor.GRAY + "send amount of 64." + ChatColor.RESET);
     	
     	recipientMessageMeta.setDisplayName(RECIPIENT_TITLE);
     	recipientMessageMeta.setLore(recipientMessageLore);
@@ -195,13 +200,11 @@ public class PaperMailGUI {
 			}
 			//If Sending Money is enabled, count the amount the player wants to send and convert it to Bank Note.
 			if((itemMeta.getDisplayName() == MONEY_SEND_BUTTON_TITLE) && (Settings.EnableSendMoney == true)){
-				if (CraftStack.getAmount() != 0){
+				if (CraftStack.getAmount() > 1){
 				double amount = CraftStack.getAmount();
 				if(PaperMailEconomy.hasMoney(amount, player) == true){
 					CraftStack = PaperMailEconomy.getBankNote(amount, player);
 					sendingContents.add(CraftStack);
-				}else{
-					player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have!" + ChatColor.RESET);
 				}
 				}
 			}
