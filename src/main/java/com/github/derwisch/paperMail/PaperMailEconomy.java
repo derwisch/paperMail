@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class PaperMailEconomy{
 	public static boolean hasMoney = true;
+	public static String BANK_NOTE_NAME;
 	
   public static int goldCounter(Player player){    /*Count the total number of Gold Ingots in Inventory if using Gold Ingot System*/
 	  int gold = 0;
@@ -88,7 +89,7 @@ public class PaperMailEconomy{
 //Converts an amount of a player's money into a custom Bank Note Item
   public static ItemStack getBankNote(double amount, Player player){
 		ItemStack bankNote = new ItemStack(Material.PAPER); 
-		String BANK_NOTE_NAME = PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RED +  ")" + ChatColor.RESET;
+		BANK_NOTE_NAME = PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RED +  ")" + ChatColor.RESET;
 		ItemMeta bankNoteMeta = bankNote.getItemMeta();
 		ArrayList<String> bankNoteLore = new ArrayList<String>();
 		bankNoteLore.add(ChatColor.GRAY + "Right Click this Bank");
@@ -101,4 +102,9 @@ public class PaperMailEconomy{
 		PaperMailEconomy.takeMoney(amount, player);
 		return bankNote;
 	}
+  
+  public static void cashBankNote(Player player, double amount){
+	  String playerName = player.getName();
+	  PaperMail.economy.depositPlayer(playerName, amount);
+  }
 }

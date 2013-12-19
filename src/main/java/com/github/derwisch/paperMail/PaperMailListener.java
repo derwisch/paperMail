@@ -298,6 +298,41 @@ public class PaperMailListener implements Listener {
     }
     
     //Create Method On Right Click Item Bank Note Deposit
+    @EventHandler
+    public void onPlayerUse(PlayerInteractEvent event){
+    	Player p = event.getPlayer();
+    	if((p.getItemInHand() != null) && (p != null) && (p.getItemInHand().getItemMeta().getDisplayName() != null) && (event.getAction() != null) && (p.getItemInHand() != new ItemStack(Material.AIR)) && (!event.getAction().equals(Action.LEFT_CLICK_AIR)) && (!event.getAction().equals(Action.LEFT_CLICK_BLOCK)) && (event != null))
+        {
+        	if((p.getItemInHand().getItemMeta().getDisplayName().contains(PaperMailGUI.BANK_NOTE_DISPLAY)) && (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && (event.getAction().equals(Action.RIGHT_CLICK_AIR))){
+        		ItemStack bankNote = p.getItemInHand();
+        		ItemMeta noteMeta = bankNote.getItemMeta();
+        		String noteTitle = noteMeta.getDisplayName();
+        		String stringCash = noteTitle;
+        		stringCash = stringCash.replace(PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + ChatColor.RED +  ")" + ChatColor.RESET, "");
+        		stringCash = stringCash.replaceAll("[^0-9]", "");
+        		p.sendMessage(stringCash);
+        		int fromString = java.lang.Integer.parseInt(stringCash);
+        		p.sendMessage(Integer.toString(fromString));
+        		double deposit = (double)fromString;
+        		PaperMailEconomy.cashBankNote(p, deposit);
+        		if(bankNote.getAmount() < 2)
+        			{
+        			p.setItemInHand(new ItemStack(Material.AIR));
+        			}else{
+        				bankNote.setAmount(bankNote.getAmount() - 1);
+        				p.setItemInHand(bankNote);
+        			}
+        		event.setCancelled(true);
+        		}
+        	else if((p.getItemInHand() == null) || (p.getItemInHand() == new ItemStack(Material.AIR)) || (event.getAction().equals(Action.LEFT_CLICK_AIR)) || (event.getAction().equals(Action.LEFT_CLICK_BLOCK)));
+        	{
+        		event.setCancelled(true);
+        	}
+        }else {
+        	event.setCancelled(true);
+        }
+        event.setCancelled(true);
+    }
     
     public void sendMail(PaperMailGUI itemMailGUI, InventoryClickEvent event, Inventory inventory) throws IOException, InvalidConfigurationException{
     	itemMailGUI.Result = SendingGUIClickResult.SEND;
