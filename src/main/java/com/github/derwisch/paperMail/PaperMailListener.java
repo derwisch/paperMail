@@ -301,6 +301,7 @@ public class PaperMailListener implements Listener {
     @EventHandler
     public void onPlayerUse(PlayerInteractEvent event){
     	Player p = event.getPlayer();
+    	if ((p.getItemInHand().hasItemMeta()) && (p.getItemInHand().getItemMeta().hasDisplayName())){
     	if((p.getItemInHand() != null) && (p != null) && (p.getItemInHand().getItemMeta().getDisplayName() != null) && (event.getAction() != null) && (p.getItemInHand() != new ItemStack(Material.AIR)) && (!event.getAction().equals(Action.LEFT_CLICK_AIR)) && (!event.getAction().equals(Action.LEFT_CLICK_BLOCK)) && (event != null))
         {
         	if((p.getItemInHand().getItemMeta().getDisplayName().contains(PaperMailGUI.BANK_NOTE_DISPLAY)) && (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && (event.getAction().equals(Action.RIGHT_CLICK_AIR))){
@@ -331,6 +332,7 @@ public class PaperMailListener implements Listener {
         }else {
         	event.setCancelled(true);
         }
+    	}
         event.setCancelled(true);
     }
     
