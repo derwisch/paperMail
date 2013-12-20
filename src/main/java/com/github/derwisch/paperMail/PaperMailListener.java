@@ -104,7 +104,7 @@ public class PaperMailListener implements Listener {
                 if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
                 	cancel = false;
                 }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
-                    player.sendMessage(ChatColor.RED + "Not enough money to send your mail, items not sent!");
+                    player.sendMessage(ChatColor.RED + "Not enough money to send your mail, mail not sent!");
                     itemMailGUI.Result = SendingGUIClickResult.CANCEL;
             		itemMailGUI.close();
             		itemMailGUI.SetClosed();
@@ -112,9 +112,10 @@ public class PaperMailListener implements Listener {
             		cancel = true;
                 }
             }
+			//   STILL NEED TO CHECK TO SEE IF SENDING MONEY AND MAILCOSTS IS ENABLED IF THERE IS MONEY TO DO BOTH
     		if((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1))
     		{
-    			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have! Sending cancelled!");
+    			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have. Mail not sent." + ChatColor.RESET);
     			itemMailGUI.Result = SendingGUIClickResult.CANCEL;
         		itemMailGUI.close();
         		itemMailGUI.SetClosed();
@@ -283,6 +284,7 @@ public class PaperMailListener implements Listener {
     			}else{
     			currentItem.setAmount(currentItem.getAmount() + Settings.Increments);
     			}
+    			sendAmount = currentItem.getAmount();
     			player.updateInventory();           
     			event.setCancelled(true);
     		}
@@ -292,11 +294,11 @@ public class PaperMailListener implements Listener {
     			}else{
     			currentItem.setAmount(currentItem.getAmount() - Settings.Increments);
     			}
+    			sendAmount = currentItem.getAmount();
     			player.updateInventory();
     			event.setCancelled(true);
     		}
     	}
-    	sendAmount = currentItem.getAmount();
     }
     
     //Create Method On Right Click Item Bank Note Deposit

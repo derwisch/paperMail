@@ -198,6 +198,7 @@ public class PaperMailGUI {
 				        }
 				    }
 			}
+			//   STILL NEED TO CHECK TO SEE IF SENDING MONEY AND MAILCOSTS IS ENABLED IF THERE IS MONEY TO DO BOTH
 			//If Sending Money is enabled, count the amount the player wants to send and convert it to Bank Note.
 			if((itemMeta.getDisplayName() == MONEY_SEND_BUTTON_TITLE) && (Settings.EnableSendMoney == true)){
 				if (CraftStack.getAmount() > 1){
