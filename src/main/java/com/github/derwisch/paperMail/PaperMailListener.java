@@ -1,6 +1,8 @@
 package com.github.derwisch.paperMail;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -301,39 +303,28 @@ public class PaperMailListener implements Listener {
     @EventHandler
     public void onPlayerUse(PlayerInteractEvent event){
     	Player p = event.getPlayer();
-    	if ((p.getItemInHand().hasItemMeta()) && (p.getItemInHand().getItemMeta().hasDisplayName())){
-    	if((p.getItemInHand() != null) && (p != null) && (p.getItemInHand().getItemMeta().getDisplayName() != null) && (event.getAction() != null) && (p.getItemInHand() != new ItemStack(Material.AIR)) && (!event.getAction().equals(Action.LEFT_CLICK_AIR)) && (!event.getAction().equals(Action.LEFT_CLICK_BLOCK)) && (event != null))
-        {
-        	if((p.getItemInHand().getItemMeta().getDisplayName().contains(PaperMailGUI.BANK_NOTE_DISPLAY)) && (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && (event.getAction().equals(Action.RIGHT_CLICK_AIR))){
+    	if ((p.getItemInHand().hasItemMeta()) && (p.getItemInHand().getItemMeta().hasDisplayName()) && (p.getItemInHand().getItemMeta().getDisplayName().contains(PaperMailGUI.BANK_NOTE_DISPLAY)) && ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) || (event.getAction().equals(Action.RIGHT_CLICK_AIR)))){
         		ItemStack bankNote = p.getItemInHand();
         		ItemMeta noteMeta = bankNote.getItemMeta();
-        		String noteTitle = noteMeta.getDisplayName();
-        		String stringCash = noteTitle;
-        		stringCash = stringCash.replace(PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + ChatColor.RED +  ")" + ChatColor.RESET, "");
-        		stringCash = stringCash.replaceAll("[^0-9]", "");
-        		p.sendMessage(stringCash);
-        		int fromString = java.lang.Integer.parseInt(stringCash);
+        		List<String> noteParse = noteMeta.getLore();
+        		String noteAmount = noteParse.get(noteParse.size() - 1); 
+        		noteAmount = noteAmount.replaceAll("[^0-9]", "");
+        		p.sendMessage(noteAmount);
+        		int fromString = java.lang.Integer.parseInt(noteAmount);
         		p.sendMessage(Integer.toString(fromString));
         		double deposit = (double)fromString;
+        		deposit = deposit / 10;
         		PaperMailEconomy.cashBankNote(p, deposit);
         		if(bankNote.getAmount() < 2)
-        			{
+        		{
         			p.setItemInHand(new ItemStack(Material.AIR));
-        			}else{
-        				bankNote.setAmount(bankNote.getAmount() - 1);
-        				p.setItemInHand(bankNote);
-        			}
-        		event.setCancelled(true);
+        		}else{
+        			bankNote.setAmount(bankNote.getAmount() - 1);
+        			p.setItemInHand(bankNote);
         		}
-        	else if((p.getItemInHand() == null) || (p.getItemInHand() == new ItemStack(Material.AIR)) || (event.getAction().equals(Action.LEFT_CLICK_AIR)) || (event.getAction().equals(Action.LEFT_CLICK_BLOCK)));
-        	{
+        		p.sendMessage(ChatColor.GREEN + "$" + deposit + " was deposited into your Account!" + ChatColor.RESET);
         		event.setCancelled(true);
-        	}
-        }else {
-        	event.setCancelled(true);
         }
-    	}
-        event.setCancelled(true);
     }
     
     public void sendMail(PaperMailGUI itemMailGUI, InventoryClickEvent event, Inventory inventory) throws IOException, InvalidConfigurationException{

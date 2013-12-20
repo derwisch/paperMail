@@ -92,10 +92,10 @@ public class PaperMailEconomy{
 		BANK_NOTE_NAME = PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RED +  ")" + ChatColor.RESET;
 		ItemMeta bankNoteMeta = bankNote.getItemMeta();
 		ArrayList<String> bankNoteLore = new ArrayList<String>();
-		bankNoteLore.add(ChatColor.GRAY + "Right Click this Bank");
-		bankNoteLore.add(ChatColor.GRAY + "Note to deposit the sum");
-		bankNoteLore.add(ChatColor.GRAY + "into your Account");
-		bankNoteLore.add(ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RESET);
+		bankNoteLore.add(ChatColor.GRAY + "Right Click this Bank" + ChatColor.RESET);
+		bankNoteLore.add(ChatColor.GRAY + "Note to deposit the sum" + ChatColor.RESET);
+		bankNoteLore.add(ChatColor.GRAY + "into your Account" + ChatColor.RESET);
+		bankNoteLore.add(ChatColor.RESET + "$" + amount);
 		bankNoteMeta.setDisplayName(BANK_NOTE_NAME);
 		bankNoteMeta.setLore(bankNoteLore);
 		bankNote.setItemMeta(bankNoteMeta);
