@@ -135,7 +135,7 @@ public class PaperMailGUI {
     	}
     	Inventory.setItem(((Settings.MailWindowRows - 1) * 9) - 1, sendButtonEnabled);
     	Inventory.setItem((Settings.MailWindowRows * 9) - 1, cancelButton);
-    	if (Settings.EnableSendMoney == true){
+    	if ((Settings.EnableSendMoney == true) && (PaperMail.economy != null)){
     		if(Settings.MailWindowRows > 3){
     		Inventory.setItem(((Settings.MailWindowRows - 2) * 9) -1, sendMoneyButton);
     		}else{
