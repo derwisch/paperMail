@@ -1,13 +1,11 @@
 package com.github.derwisch.paperMail;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -21,7 +19,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
  
@@ -86,22 +83,30 @@ public class PaperMailListener implements Listener {
     	boolean cancel = false;
     	for (int i = 0; i < inventory.getSize(); i++) {
     		ItemStack CraftStack = inventory.getItem(i);
-    		if (CraftStack != null)
+    		if (CraftStack != null && CraftStack.hasItemMeta() && CraftStack.getItemMeta().hasDisplayName())
     		{
     		ItemMeta itemMeta = CraftStack.getItemMeta();
     		if (itemMeta.getDisplayName() != PaperMailGUI.SEND_BUTTON_ON_TITLE && 
     				itemMeta.getDisplayName() != PaperMailGUI.CANCEL_BUTTON_TITLE && 
     				itemMeta.getDisplayName() != PaperMailGUI.ENDERCHEST_BUTTON_TITLE &&
     				CraftStack.getType() != Material.WRITTEN_BOOK && 
-    				CraftStack != null) {
+    				CraftStack != null &&
+    				itemMeta.getDisplayName() != PaperMailGUI.MONEY_SEND_BUTTON_TITLE) {
+    				if((Settings.EnableMailCosts == true) && (itemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) && (CraftStack.getAmount() > 1)){
+    					sendAmount = CraftStack.getAmount();
+    				}
     				numItems++;
     		}
     	}}
-    	if(Settings.PerItemCosts == true)
+    	if(Settings.PerItemCosts == true){
     		ItemCost = numItems * Settings.ItemCost;
+    	}
+    	if(Settings.EnableSendMoney && sendAmount > 1){
+        	ItemCost = ItemCost + sendAmount;
+        }
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE) {
     		if ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && (sendAmount > 1)){
-                if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
+    			if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
                 	cancel = false;
                 }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
                     player.sendMessage(ChatColor.RED + "Not enough money to send your mail, mail not sent!");
@@ -113,7 +118,7 @@ public class PaperMailListener implements Listener {
                 }
             }
 			//   STILL NEED TO CHECK TO SEE IF SENDING MONEY AND MAILCOSTS IS ENABLED IF THERE IS MONEY TO DO BOTH
-    		if((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1))
+    		if((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1) && Settings.EnableMailCosts == false)
     		{
     			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have. Mail not sent." + ChatColor.RESET);
     			itemMailGUI.Result = SendingGUIClickResult.CANCEL;
@@ -130,7 +135,7 @@ public class PaperMailListener implements Listener {
         		event.setCancelled(true);
         		cancel = true;
 	    		}
-            if(writtenBookBoolean && ((Settings.EnableMailCosts == false) || (Settings.ItemCost == 0) || player.hasPermission(Permissions.COSTS_EXEMPT)) && (cancel != true)) {
+            if(writtenBookBoolean && ((Settings.EnableMailCosts == false) || (Settings.ItemCost == 0) || player.hasPermission(Permissions.COSTS_EXEMPT)) && ((Settings.EnableSendMoney == false) || (((Settings.EnableSendMoney == true) && (sendAmount == 0)))) && (cancel != true)) {
             	cancel = false;
     		}
             if (cancel != true)
