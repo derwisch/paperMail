@@ -101,38 +101,37 @@ public class PaperMailListener implements Listener {
     	if(Settings.PerItemCosts == true){
     		ItemCost = numItems * Settings.ItemCost;
     	}
-    	if(Settings.EnableSendMoney && sendAmount > 1){
+    	if((Settings.EnableSendMoney) && (sendAmount > 1)){
         	ItemCost = ItemCost + sendAmount;
         }
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE) {
-    		if ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && (sendAmount > 1)){
+    		if (((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && ((sendAmount > 1) && Settings.EnableSendMoney)) || ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && ((sendAmount == 0) && Settings.EnableSendMoney == false))){
     			if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
                 	cancel = false;
                 }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
                     player.sendMessage(ChatColor.RED + "Not enough money to send your mail, mail not sent!");
-                    itemMailGUI.Result = SendingGUIClickResult.CANCEL;
-            		itemMailGUI.close();
-            		itemMailGUI.SetClosed();
-            		event.setCancelled(true);
+                    cancelSend(event, itemMailGUI);
+            		cancel = true;
+                }
+            }else if((Settings.EnableSendMoney == false || sendAmount == 0) && ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)))){
+            	if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
+                	cancel = false;
+                }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
+                    player.sendMessage(ChatColor.RED + "Not enough money to send your mail, mail not sent!");
+                    cancelSend(event, itemMailGUI);
             		cancel = true;
                 }
             }
 			//   STILL NEED TO CHECK TO SEE IF SENDING MONEY AND MAILCOSTS IS ENABLED IF THERE IS MONEY TO DO BOTH
-    		if((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1) && Settings.EnableMailCosts == false)
+    		if(((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1)) && (writtenBookBoolean) && ((Settings.EnableItemMail == false) || ItemCost == 0 || player.hasPermission(Permissions.COSTS_EXEMPT)))
     		{
     			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have. Mail not sent." + ChatColor.RESET);
-    			itemMailGUI.Result = SendingGUIClickResult.CANCEL;
-        		itemMailGUI.close();
-        		itemMailGUI.SetClosed();
-        		event.setCancelled(true);
+    			cancelSend(event, itemMailGUI);
         		cancel = true;
     		}
             if (!writtenBookBoolean) {
     			((Player)inventory.getHolder()).sendMessage(ChatColor.RED + "No recipient defined" + ChatColor.RESET);
-    			itemMailGUI.Result = SendingGUIClickResult.CANCEL;
-        		itemMailGUI.close();
-        		itemMailGUI.SetClosed();
-        		event.setCancelled(true);
+    			cancelSend(event, itemMailGUI);
         		cancel = true;
 	    		}
             if(writtenBookBoolean && ((Settings.EnableMailCosts == false) || (Settings.ItemCost == 0) || player.hasPermission(Permissions.COSTS_EXEMPT)) && ((Settings.EnableSendMoney == false) || (((Settings.EnableSendMoney == true) && (sendAmount == 0)))) && (cancel != true)) {
@@ -341,5 +340,12 @@ public class PaperMailListener implements Listener {
     	itemMailGUI = null;
     	PaperMailGUI.RemoveGUI(((Player) inventory.getHolder()).getName());
     	
+    }
+    
+    public void cancelSend(InventoryClickEvent event, PaperMailGUI itemMailGUI){
+    	itemMailGUI.Result = SendingGUIClickResult.CANCEL;
+		itemMailGUI.close();
+		itemMailGUI.SetClosed();
+		event.setCancelled(true);
     }
 }
