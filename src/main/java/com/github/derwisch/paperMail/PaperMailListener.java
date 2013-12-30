@@ -271,12 +271,11 @@ public class PaperMailListener implements Listener {
     		
     	}
     }
-    @SuppressWarnings("deprecation")
-	@EventHandler
+    
+    @EventHandler
     public void onInventoryClick_MailGUI_sendMoney(InventoryClickEvent event) {
     	Inventory inv = event.getInventory();
     	inv.setMaxStackSize(127);
-    	Player player = ((Player)inv.getHolder());
     	ItemStack currentItem = event.getCurrentItem();
     	ItemMeta currentItemMeta = (currentItem == null) ? null : currentItem.getItemMeta();
     	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
@@ -288,8 +287,7 @@ public class PaperMailListener implements Listener {
     			}else{
     			currentItem.setAmount(currentItem.getAmount() + Settings.Increments);
     			}
-    			sendAmount = currentItem.getAmount();
-    			player.updateInventory();           
+    			sendAmount = currentItem.getAmount();           
     			event.setCancelled(true);
     		}
     		if ((currentItemMeta != null) && (currentItemMeta.getDisplayName() == PaperMailGUI.MONEY_SEND_BUTTON_TITLE) && (event.getClick().isRightClick())) {
@@ -299,7 +297,6 @@ public class PaperMailListener implements Listener {
     			currentItem.setAmount(currentItem.getAmount() - Settings.Increments);
     			}
     			sendAmount = currentItem.getAmount();
-    			player.updateInventory();
     			event.setCancelled(true);
     		}
     	}

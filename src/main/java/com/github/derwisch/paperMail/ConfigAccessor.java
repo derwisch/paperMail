@@ -39,7 +39,8 @@ public class ConfigAccessor {
     private File configFile;
     private FileConfiguration fileConfiguration;
 
-    public ConfigAccessor(JavaPlugin plugin, String fileName) {
+    @SuppressWarnings("deprecation")
+	public ConfigAccessor(JavaPlugin plugin, String fileName) {
         if (plugin == null)
             throw new IllegalArgumentException("plugin cannot be null");
         if (!plugin.isInitialized())
