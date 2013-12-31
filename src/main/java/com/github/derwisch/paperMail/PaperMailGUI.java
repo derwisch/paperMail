@@ -212,6 +212,7 @@ public class PaperMailGUI {
 		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
 				itemCost = numItems * itemCost;		
 		}
+		//itemCost will always equal what it is set to in config at this point, even if there are no items to be sent. Need to fix this.
 		if(((Settings.EnableMailCosts == true && itemCost != 0 && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || ((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) || (Settings.EnableSendMoney == true && amount > 1)){
 			if((Settings.EnableMailCosts == true && itemCost != 0) && (Settings.EnableSendMoney == true && amount > 1)){
 				double totalcost = itemCost + amount;
