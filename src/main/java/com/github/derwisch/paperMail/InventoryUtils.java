@@ -307,7 +307,7 @@ public class InventoryUtils
 
 	// ---------------------------------
 
-	//
+	//Get the player's armor and return it as an inventory
     public static Inventory getArmorInventory(PlayerInventory playerInventory) {
         ItemStack[] armor = playerInventory.getArmorContents();
         Inventory inventory = createInventory(null, armor.length);
@@ -338,7 +338,8 @@ public class InventoryUtils
 			//Don't add the item, Inventory is full
 	}
 	}
-
+    
+    //Alias for inventoryCheck
     public static boolean inventoryCheck(Player player, ItemStack is){
     	return inventoryCheck(player.getInventory(), is);
 	}

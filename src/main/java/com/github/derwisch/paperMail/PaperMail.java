@@ -74,7 +74,8 @@ public class PaperMail extends JavaPlugin {
     	getLogger().info("Disabled PaperMail");
     }
     
-    private void initializeRecipes() {
+    @SuppressWarnings("deprecation")
+	private void initializeRecipes() {
 		ItemStack letterPaper = new ItemStack(Settings.MailItemID);
 		ItemMeta letterPaperMeta = letterPaper.getItemMeta();
 		ArrayList<String> letterPaperLore = new ArrayList<String>();
@@ -131,7 +132,8 @@ public class PaperMail extends JavaPlugin {
      }
 
      
-   public Boolean setupEconomy()
+   @SuppressWarnings("rawtypes")
+public Boolean setupEconomy()
      {
        Plugin vault = getServer().getPluginManager().getPlugin("Vault");
       if (vault == null) {

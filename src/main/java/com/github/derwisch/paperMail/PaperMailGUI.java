@@ -160,7 +160,6 @@ public class PaperMailGUI {
 		Player.closeInventory();
 	}
 	
-	@SuppressWarnings("null")
 	public void SendContents() throws IOException, InvalidConfigurationException {
 		Player player = this.Player;
 		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();
@@ -183,8 +182,10 @@ public class PaperMailGUI {
 				CraftStack.getType() != Material.WRITTEN_BOOK &&
 				itemMeta.getDisplayName() != MONEY_SEND_BUTTON_TITLE) {
 				sendingContents.add(CraftStack);
+				//count the total number of items to be sent
 				numItems = numItems + CraftStack.getAmount();
 			}
+			//get the name from the Written book of the recipient
 			if (CraftStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
 				BookMeta bookMeta = (BookMeta)itemMeta;
 				Player p = Bukkit.getPlayer(bookMeta.getTitle());
@@ -200,8 +201,7 @@ public class PaperMailGUI {
 				        }
 				    }
 			}
-			//   STILL NEED TO CHECK TO SEE IF SENDING MONEY AND MAILCOSTS IS ENABLED IF THERE IS MONEY TO DO BOTH
-			//If Sending Money is enabled, count the amount the player wants to send and convert it to Bank Note.
+			//If Sending Money is enabled, count the amount the player wants to send and convert it to Bank Note later.
 			if((itemMeta.getDisplayName() == MONEY_SEND_BUTTON_TITLE) && (Settings.EnableSendMoney == true)){
 				if (CraftStack.getAmount() > 1){
 				amount = CraftStack.getAmount();
@@ -212,24 +212,27 @@ public class PaperMailGUI {
 		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
 				itemCost = numItems * itemCost;		
 		}
-		//itemCost will always equal what it is set to in config at this point, even if there are no items to be sent. Need to fix this.
-		if(((Settings.EnableMailCosts == true && itemCost != 0 && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || ((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) || (Settings.EnableSendMoney == true && amount > 1)){
-			if((Settings.EnableMailCosts == true && itemCost != 0) && (Settings.EnableSendMoney == true && amount > 1)){
+		if(((Settings.EnableMailCosts == true && numItems != 0 && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || ((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) || (Settings.EnableSendMoney == true && amount > 1)){
+			//if itemcosts and sending money is enabled
+			if((Settings.EnableMailCosts == true && numItems != 0) && (Settings.EnableSendMoney == true && amount > 1)){
 				double totalcost = itemCost + amount;
 				if(PaperMailEconomy.hasMoney(totalcost, player)){
 					PaperMailEconomy.takeMoney(itemCost, player);
 					CraftStack = PaperMailEconomy.getBankNote(amount, player);
 					sendingContents.add(CraftStack);
 				}
-			}else if(PaperMailEconomy.hasMoney(itemCost, player) && (Settings.EnableMailCosts == true) && (itemCost != 0) && ((Settings.EnableSendMoney == false) || (amount < 2))){
+			//if only itemCosts is enabled
+			}else if(PaperMailEconomy.hasMoney(itemCost, player) && (Settings.EnableMailCosts == true) && (numItems != 0) && ((Settings.EnableSendMoney == false) || (amount < 2))){
 				PaperMailEconomy.takeMoney(itemCost, player);
 			}
 		}
-		if(Settings.EnableSendMoney && (this.Player.hasPermission(Permissions.COSTS_EXEMPT)) || (Settings.EnableMailCosts == false) || (itemCost == 0)){
+		//If there are no items to be sent, yet player is still sending money.
+		if(Settings.EnableSendMoney && (this.Player.hasPermission(Permissions.COSTS_EXEMPT)) || (Settings.EnableMailCosts == false) || (itemCost == 0) || (numItems == 0)){
 			CraftStack = PaperMailEconomy.getBankNote(amount, player);
 			sendingContents.add(CraftStack);
 		}
 		
+		//add the items to the recipients inbox.
 			Inbox inbox = Inbox.GetInbox(playerName);
 			inbox.AddItems(sendingContents, Player);
 		

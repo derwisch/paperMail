@@ -34,7 +34,8 @@ public class PaperMailListener implements Listener {
 		}
     }
     
-    @EventHandler
+    @SuppressWarnings("deprecation")
+	@EventHandler
     public void onClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack itemInHand = player.getItemInHand();
@@ -198,7 +199,8 @@ public class PaperMailListener implements Listener {
     	player.openInventory(inventory);
     }
     
-    @EventHandler
+    @SuppressWarnings("deprecation")
+	@EventHandler
     public void onInventoryClick_MailGUI_Recipient(InventoryClickEvent event) {
     	if (event.getInventory().getName() != PaperMail.NEW_MAIL_GUI_TITLE)
     		return;
@@ -313,7 +315,7 @@ public class PaperMailListener implements Listener {
         		String noteAmount = noteParse.get(noteParse.size() - 1); 
         		noteAmount = noteAmount.replaceAll("[^0-9]", "");
         		int fromString = java.lang.Integer.parseInt(noteAmount);
-        		double deposit = (double)fromString;
+        		double deposit = fromString;
         		deposit = deposit / 10;
         		PaperMailEconomy.cashBankNote(p, deposit);
         		if(bankNote.getAmount() < 2)

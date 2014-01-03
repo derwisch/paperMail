@@ -12,8 +12,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class PaperMailEconomy{
 	public static boolean hasMoney = true;
 	public static String BANK_NOTE_NAME;
-	
-  public static int goldCounter(Player player){    /*Count the total number of Gold Ingots in Inventory if using Gold Ingot System*/
+
+	/*Count the total number of Gold Ingots in Inventory if using Gold Ingot System*/
+    public static int goldCounter(Player player){    
 	  int gold = 0;
 	  for (ItemStack i : player.getInventory()) {
 		  if ((i != null) && (i.getType() == Material.GOLD_INGOT)){
@@ -25,7 +26,9 @@ public class PaperMailEconomy{
 	  return gold;
 		}
   
-  public static void takeGold(int Price, Player player){    /*Take Gold Ingots from Inventory if using Gold Ingot System*/
+    /*Take Gold Ingots from Inventory if using Gold Ingot System*/
+    @SuppressWarnings("deprecation")
+	public static void takeGold(int Price, Player player){    
 	  int change;
 	  int goldLeft = Price;
 	  for (ItemStack i : player.getInventory().getContents()){
@@ -50,9 +53,10 @@ public class PaperMailEconomy{
 			  	}
 			  }
 			  }
-	  }
-  //take money from the player
-  public static void takeMoney(Double price, Player player){
+	}
+    
+    //take money from the player
+    public static void takeMoney(Double price, Player player){
     if (!(PaperMail.isGoldIngot())) {
 				PaperMail.economy.withdrawPlayer(player.getName(), price.doubleValue());
 				player.sendMessage(ChatColor.GREEN + "%price% removed from Wallet!".replace("%price%", new StringBuilder().append(ChatColor.WHITE).append(price.toString()).toString()));   
@@ -66,8 +70,9 @@ public class PaperMailEconomy{
        player.sendMessage(ChatColor.GREEN + "%price% Gold Ingots removed from Inventory!".replace("%price%", sb.append(ChatColor.WHITE)).toString());    
       }
     }
-  //check if player has correct amount of currency, return true if they do, false if they don't
-  public static boolean hasMoney(Double price, Player player){
+    
+    //check if player has correct amount of currency, return true if they do, false if they don't
+    public static boolean hasMoney(Double price, Player player){
 	  if ((!(PaperMail.isGoldIngot())) && (Settings.EnableMailCosts != false) && (price != 0)) {
 		  if (PaperMail.economy.getBalance(player.getName()) < price.doubleValue()) {
 		  		hasMoney = false;
@@ -86,8 +91,8 @@ public class PaperMailEconomy{
 	  return true;
   }
   
-//Converts an amount of a player's money into a custom Bank Note Item
-  public static ItemStack getBankNote(double amount, Player player){
+    //Converts an amount of a player's money into a custom Bank Note Item
+    public static ItemStack getBankNote(double amount, Player player){
 		ItemStack bankNote = new ItemStack(Material.PAPER); 
 		BANK_NOTE_NAME = PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RED +  ")" + ChatColor.RESET;
 		ItemMeta bankNoteMeta = bankNote.getItemMeta();
@@ -102,8 +107,9 @@ public class PaperMailEconomy{
 		PaperMailEconomy.takeMoney(amount, player);
 		return bankNote;
 	}
-  
-  public static void cashBankNote(Player player, double amount){
+    
+    //Deposit the banknote into the player's bank account
+    public static void cashBankNote(Player player, double amount){
 	  String playerName = player.getName();
 	  PaperMail.economy.depositPlayer(playerName, amount);
   }
