@@ -69,13 +69,8 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	                    	return true;
 						}
                     }
-					//if costs are turned off send textmail
-					if(Settings.EnableMailCosts == false){
-						sendText(player, args);
-						return true;
-					}
-					//if player is cost exempt send textmail
-					if(player.hasPermission(Permissions.COSTS_EXEMPT)){
+					//if player is cost exempt or price is zero or mailcosts is off send textmail
+					if((Settings.EnableMailCosts == false) || (player.hasPermission(Permissions.COSTS_EXEMPT) && (Settings.EnableMailCosts == true)) || ((Settings.EnableMailCosts == true) && (Settings.Price == 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)))){
 						sendText(player, args);
 						return true;
 					}
