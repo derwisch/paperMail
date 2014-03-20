@@ -166,7 +166,7 @@ public class PaperMailGUI {
 		String playerName = "";
 		int numItems = 0;
 		double itemCost = Settings.ItemCost;
-		double amount = 0;
+		int amount = 0;
 		ItemStack CraftStack;
 		for (int i = 0; i < Inventory.getSize(); i++) {
 			

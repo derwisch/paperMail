@@ -25,6 +25,7 @@ public class Settings {
 	public static double ItemCost = 0;
 	public static int MailItemID = 339;
 	public static int MailItemDV = 1;
+	public static int BankNoteNum = 339;
 	public static int Increments = 1;
 	public static String MailItemName = "Letter paper";
 	
@@ -47,6 +48,7 @@ public class Settings {
 
         	MailItemID = config.getInt("general.MailItemID");
         	MailItemDV = config.getInt("general.MailItemDV");
+        	BankNoteNum = config.getInt("general.BankNoteID");
         	MailItemName = config.getString("general.MailItemName");
         	
         	InboxPlayers = config.getStringList("inboxPlayers");
@@ -71,6 +73,7 @@ public class Settings {
     	
     	config.set("general.MailItemID", MailItemID);
     	config.set("general.MailItemDV", MailItemDV);
+    	config.set("general.BankNoteID", BankNoteNum);
     	config.set("general.MailItemName", MailItemName);
     	    	
     	config.set("inboxPlayers", InboxPlayers);
