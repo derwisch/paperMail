@@ -91,9 +91,9 @@ public class PaperMailEconomy{
   }
   
     //Converts an amount of a player's money into a custom Bank Note Item
-    @SuppressWarnings("deprecation") //getMaterial by int is deprecated, but we'll use it for now
+    @SuppressWarnings("deprecation") //new ItemStack(int) is deprecated, but we'll use it for now
 	public static ItemStack getBankNote(int amount, Player player){
-		ItemStack bankNote = new ItemStack(Material.getMaterial(Settings.BankNoteNum), 1); 
+		ItemStack bankNote = new ItemStack(Settings.BankNoteNum); 
 		String BANK_NOTE_NAME = PaperMailGUI.BANK_NOTE_DISPLAY + ChatColor.RED + "(" + ChatColor.GREEN + "$" + ChatColor.GOLD + amount + ChatColor.RED +  ")" + ChatColor.RESET;
 		ItemMeta bankNoteMeta = bankNote.getItemMeta();
 		ArrayList<String> bankNoteLore = new ArrayList<String>();
