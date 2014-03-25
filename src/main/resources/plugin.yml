@@ -1,6 +1,8 @@
 name: PaperMail
+version: 1.0.1.3
+author: DrkMatr1984
 main: com.github.derwisch.paperMail.PaperMail
-version: 1.0.0.4
+softdepend: [Vault]
       
 commands:
    papermail:
@@ -15,6 +17,7 @@ permissions:
             papermail.send.item.box: true
             papermail.createchest.self: true
             papermail.createchest.everyone: true
+            papermail.costs.exempt: true
     papermail.send.text:
         description: Allows to send textmails
         default: true
@@ -29,4 +32,7 @@ permissions:
         default: false
         children:
             papermail.createchest.self: true
+    papermail.costs.exempt:
+        description: Allows player to send mail for free even if costs are enabled in config
+        default: false
         
