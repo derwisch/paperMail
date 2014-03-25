@@ -1,20 +1,21 @@
 general:
-    EnableTextMail: true
-    EnableItemMail: true
-    EnableEnderchest: true
-    EnableMailCosts: false
-    EnablePerItemCosts: false
-    CostToText: 0
-    SendItemCost: 0
-    MailWindowRows: 3
-    DefaultBoxRows: 4
-    EnderChestRequirementID: 368   
-    EnderChestRequirementDV: 0
-    MailItemID: 339
-    MailItemDV: 1
-    MailItemName: 'Letter paper'
-
+  EnableTextMail: true
+  EnableItemMail: true
+  EnableEnderchest: true
+  EnableMailCosts: false
+  EnablePerItemCosts: false
+  EnableSendMoney: false
+  CostToText: 0.0
+  SendItemCost: 0.0
+  MailWindowRows: 3
+  DefaultBoxRows: 4
+  EnderChestRequirementID: 368
+  EnderChestRequirementDV: 0
+  MailItemID: 339
+  MailItemDV: 1
+  BankNoteID: 339
+  MailItemName: Letter paper  
 messages:
-    inbox-full-send: 'The mailbox of %recipient% is full, the items have been sent back to you.'
-    ingredient-missing: 'You are missing %item% to create a new letter.'
-    
+  inbox-full-send: The mailbox of %recipient% is full, the items have been sent back to you.
+  ingredient-missing: You are missing %item% to create a new letter.
+inboxPlayers: []
