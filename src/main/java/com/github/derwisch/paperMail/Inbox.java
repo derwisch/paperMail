@@ -112,13 +112,11 @@ public class Inbox {
 	
 	private void loadItems() throws IOException, InvalidConfigurationException {
 		int i = 0;
-		int n = 0;
 		ItemStack oldstack = null;
 		ItemStack stack = null;
-		ItemStack queueStack = null;
 		String itemString = null;
-		String queueString = null;
 		String queueName = playerName + "Queue" + ".yml";
+		boolean check = false;
 		//Load Current stack save format
 		YamlConfiguration yaml = new Utf8YamlConfiguration();
 		YamlConfiguration queueYaml = new Utf8YamlConfiguration();
@@ -128,35 +126,27 @@ public class Inbox {
 		yaml.load(yamlfile);
 		queueYaml.load(queueFile);
 		do {
-			  queueString = queueYaml.getString("newitemstack." + n);
+			  
 			  itemString = yaml.getString("newitemstack." + i);
-		      if (itemString != null) {
+			  if (itemString != null) {
 		        stack = InventoryUtils.stringToItemStack(itemString);
+		        inventory.addItem(stack);
+		        check = InventoryUtils.inventoryCheck(inventory, stack);
+		      }else if(InventoryUtils.inventoryCheck(inventory, stack) == true){
+		    	  do {
+		    		  itemString = queueYaml.getString("newitemstack." + i);
+		    		  if (itemString != null) {
+		  		        stack = InventoryUtils.stringToItemStack(itemString);
+		    		  }
+		    		  check = InventoryUtils.inventoryCheck(inventory, stack);
+		    		  if (check == true){
+		    			  inventory.addItem(stack);
+		    		  }
+		    	  }while((itemString != null) || (check != false));
 		      }
-		      if (queueString != null) {
-			        queueStack = InventoryUtils.stringToItemStack(queueString);
-			  }
-		      if (stack != null) {
-		    	  if (InventoryUtils.inventoryCheck(this.inventory, stack) == true)
-					{
-		    	  	this.inventory.addItem(stack);
-					}else{
-						saveQueue(playerName, (CraftItemStack) stack);
-					}
-		      }else{
-		    	  if(queueStack != null){
-		    	  if (InventoryUtils.inventoryCheck(this.inventory, queueStack) == true)
-					{
-		    	  	this.inventory.addItem(queueStack);
-		    	  	queueYaml.set("newitemstack." + n, "");
-		    	  	n++;
-					}else{
-						saveQueue(playerName, (CraftItemStack) queueStack);
-					} 
-		      }
-		      }
+			  
 		      i++;
-		    }while (((queueString != null) && (itemString != null)));
+		    }while ((itemString != null) || (check != false));
 		queueYaml.save(queueFile);
 		i = 0;
 		//Load old old stacks for conversion, set slots to empty after load
@@ -310,18 +300,19 @@ public class Inbox {
 			String yamlname = playerName + "Queue" + ".yml";
 			queueFile = new File(PaperMail.instance.getDataFolder(), "players\\" + yamlname);
 			YamlConfiguration yaml = new Utf8YamlConfiguration();
-			String item = InventoryUtils.itemstackToString(itemStack);
+			String item = "";
 			if(queueFile.exists()){
 				yaml.load(queueFile);
 				//get current placeholder number
 				do {
 					itemString = yaml.getString("newitemstack." + n);
 			      if (itemString != null) {
+			    	  yaml.set("newitemstack." + n, itemString);
 			        n++;
 			      }
 			    }while ((itemString != null));
-				n++;
 			}
+			item = InventoryUtils.itemstackToString(itemStack);
 				if (item != null) {
 					yaml.set("newitemstack." + n, item);
 				}

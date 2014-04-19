@@ -21,6 +21,7 @@ public class Settings {
 	public static int EnderChestRequirementID = 368;
 	public static int EnderChestRequirementDV = 0;
 	
+	public static int CurrencyItemID = 266;
 	public static double Price = 0;
 	public static double ItemCost = 0;
 	public static int MailItemID = 339;
@@ -46,6 +47,7 @@ public class Settings {
         	Price = config.getDouble("general.CostToText");
         	ItemCost = config.getDouble("general.SendItemCost");
 
+        	CurrencyItemID = config.getInt("general.CurrencyItemID");
         	MailItemID = config.getInt("general.MailItemID");
         	MailItemDV = config.getInt("general.MailItemDV");
         	BankNoteNum = config.getInt("general.BankNoteID");
@@ -71,6 +73,7 @@ public class Settings {
     	config.set("general.CostToText", Price);
     	config.set("general.SendItemCost", ItemCost);
     	
+    	config.set("general.CurrencyItemID", CurrencyItemID);
     	config.set("general.MailItemID", MailItemID);
     	config.set("general.MailItemDV", MailItemDV);
     	config.set("general.BankNoteID", BankNoteNum);
