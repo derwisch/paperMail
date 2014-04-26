@@ -316,7 +316,6 @@ public class PaperMailListener implements Listener {
         		noteAmount = noteAmount.replaceAll("[^0-9]", "");
         		int fromString = java.lang.Integer.parseInt(noteAmount);
         		double deposit = fromString;
-        		deposit = deposit / 10;
         		PaperMailEconomy.cashBankNote(p, deposit);
         		if(bankNote.getAmount() < 2)
         		{

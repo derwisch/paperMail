@@ -212,7 +212,7 @@ public class PaperMailGUI {
 		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
 				itemCost = numItems * itemCost;		
 		}
-		if(((Settings.EnableMailCosts == true && (numItems != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || ((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) || (Settings.EnableSendMoney == true && amount > 1)){
+		if(((Settings.EnableMailCosts == true && (numItems != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || (((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true || amount > 1))){
 			//if itemcosts and sending money is enabled
 			if((Settings.EnableMailCosts == true && numItems != 0) && (Settings.EnableSendMoney == true && amount > 1)){
 				double totalcost = itemCost + amount;

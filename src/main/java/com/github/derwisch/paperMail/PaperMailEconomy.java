@@ -55,11 +55,11 @@ public class PaperMailEconomy{
 	}
     
     //take money from the player
-    @SuppressWarnings({ "deprecation", "unused" })
+    @SuppressWarnings({ "deprecation" })
 	public static void takeMoney(Double price, Player player){
     if (!(PaperMail.isGoldIngot())) {
 				PaperMail.economy.withdrawPlayer(player.getName(), price.doubleValue());
-				player.sendMessage(ChatColor.GREEN + "%price% removed from Wallet!".replace("%price%", new StringBuilder().append(ChatColor.WHITE).append(price.toString()).toString()));   
+				player.sendMessage(ChatColor.GREEN + "%price% removed from Wallet!".replace("%price%", new StringBuilder().append(ChatColor.WHITE).append(price.toString()).toString()) + ChatColor.RESET);   
     }
    else {
 	   String currencyName = Material.getMaterial(Settings.CurrencyItemID).toString();
@@ -68,7 +68,11 @@ public class PaperMailEconomy{
        StringBuilder sb = new StringBuilder();
        sb.append("");
        sb.append(goldPrice);
-       player.sendMessage(ChatColor.GREEN + "%price% %currencyName% removed from Inventory!".replace("%price%", sb.append(ChatColor.WHITE)).toString());    
+       StringBuilder sb1 = new StringBuilder();
+       sb1.append("");
+       sb1.append(currencyName);
+       currencyName = sb1.toString().replace("_", " ");
+       player.sendMessage(ChatColor.WHITE + "%price%".replace("%price%", sb.append(ChatColor.WHITE)).toString() + " " + ChatColor.YELLOW + "%currencyName%".replace("%currencyName%", currencyName) + ChatColor.GREEN + " " + "removed from Inventory!" + ChatColor.RESET);    
       }
     }
     

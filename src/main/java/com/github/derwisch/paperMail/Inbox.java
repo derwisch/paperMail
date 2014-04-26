@@ -1,29 +1,15 @@
 package com.github.derwisch.paperMail;
-
+//general Java imports
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-
-
-
-
-
-
 //    minecraft internals
 import net.minecraft.server.v1_7_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_7_R1.NBTTagCompound;
 import net.minecraft.server.v1_7_R1.NBTTagList;
-
-
-
-
-
-
-
 //    bukkit/craftbukkit imports
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
