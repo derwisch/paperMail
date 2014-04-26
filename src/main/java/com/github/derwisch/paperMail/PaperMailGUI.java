@@ -208,18 +208,20 @@ public class PaperMailGUI {
 				}
 			}
 		}
-		//Take the money for each item sent if PerItemCosts is enabled
+		//Calculate the money for each item sent if PerItemCosts is enabled
 		if ((Settings.EnableMailCosts == true) && (Settings.PerItemCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))){
 				itemCost = numItems * itemCost;		
 		}
-		if(((Settings.EnableMailCosts == true && numItems != 0 && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || ((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) || (Settings.EnableSendMoney == true && amount > 1)){
+		if(((Settings.EnableMailCosts == true && (numItems != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) && (Settings.EnableSendMoney == true && amount > 1)) || ((Settings.EnableMailCosts == true) && (Settings.ItemCost != 0) && (!this.Player.hasPermission(Permissions.COSTS_EXEMPT))) || (Settings.EnableSendMoney == true && amount > 1)){
 			//if itemcosts and sending money is enabled
 			if((Settings.EnableMailCosts == true && numItems != 0) && (Settings.EnableSendMoney == true && amount > 1)){
 				double totalcost = itemCost + amount;
 				if(PaperMailEconomy.hasMoney(totalcost, player)){
 					PaperMailEconomy.takeMoney(itemCost, player);
+					if(amount > 1){
 					CraftStack = PaperMailEconomy.getBankNote(amount, player);
 					sendingContents.add(CraftStack);
+					}
 				}
 			//if only itemCosts is enabled
 			}else if(PaperMailEconomy.hasMoney(itemCost, player) && (Settings.EnableMailCosts == true) && (numItems != 0) && ((Settings.EnableSendMoney == false) || (amount < 2))){
@@ -227,9 +229,11 @@ public class PaperMailGUI {
 			}
 		}
 		//If there are no items to be sent, yet player is still sending money.
-		if(Settings.EnableSendMoney && (this.Player.hasPermission(Permissions.COSTS_EXEMPT)) || (Settings.EnableMailCosts == false) || (itemCost == 0) || (numItems == 0)){
-			CraftStack = PaperMailEconomy.getBankNote(amount, player);
-			sendingContents.add(CraftStack);
+		if((Settings.EnableSendMoney == true) && ((this.Player.hasPermission(Permissions.COSTS_EXEMPT)) || (Settings.EnableMailCosts == false) || (itemCost == 0) || (numItems == 0))){
+			if(amount > 1){
+				CraftStack = PaperMailEconomy.getBankNote(amount, player);
+				sendingContents.add(CraftStack);
+				}
 		}
 		
 		//add the items to the recipients inbox.
@@ -241,7 +245,6 @@ public class PaperMailGUI {
 			itemInHand.setAmount(itemInHand.getAmount() - 1);
 			Player.setItemInHand(itemInHand);
 		}
-		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);
 	}
 	
 	public static PaperMailGUI GetGUIfromPlayer(Player player) {
