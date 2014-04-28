@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 //    minecraft internals
-import net.minecraft.server.v1_7_R2.NBTCompressedStreamTools;
-import net.minecraft.server.v1_7_R2.NBTTagCompound;
-import net.minecraft.server.v1_7_R2.NBTTagList;
+import net.minecraft.server.v1_7_R3.NBTCompressedStreamTools;
+import net.minecraft.server.v1_7_R3.NBTTagCompound;
+import net.minecraft.server.v1_7_R3.NBTTagList;
 //    bukkit/craftbukkit imports
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,7 +20,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_7_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -152,7 +152,7 @@ public class Inbox {
 			  if(item != null)
 			  {
 				  int index = item.getInt("index");
-				  net.minecraft.server.v1_7_R2.ItemStack is = net.minecraft.server.v1_7_R2.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
+				  net.minecraft.server.v1_7_R3.ItemStack is = net.minecraft.server.v1_7_R3.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
 				  cis = CraftItemStack.asCraftMirror(is);
 				  if (InventoryUtils.inventoryCheck(inventory, cis) == true)
 				  {
