@@ -7,7 +7,7 @@ import org.bukkit.configuration.Configuration;
 
 public class Settings {
 
-	// Config values
+	// Config default values
 	public static boolean EnableTextMail = true;
 	public static boolean EnableItemMail = true;
 	public static boolean EnableEnderchest = true;

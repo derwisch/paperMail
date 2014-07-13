@@ -51,6 +51,8 @@ public class PaperMail extends JavaPlugin {
     	
     	PaperMailCommandExecutor commandExecutor = new PaperMailCommandExecutor(this); 
     	getCommand("papermail").setExecutor(commandExecutor);
+    	getCommand("sendtext").setExecutor(commandExecutor);
+    	getCommand("createbox").setExecutor(commandExecutor);
     	
     	listener = new PaperMailListener();
         this.getServer().getPluginManager().registerEvents(listener, this);

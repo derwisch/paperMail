@@ -160,6 +160,7 @@ public class PaperMailGUI {
 		Player.closeInventory();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void SendContents() throws IOException, InvalidConfigurationException {
 		Player player = this.Player;
 		ArrayList<ItemStack> sendingContents = new ArrayList<ItemStack>();

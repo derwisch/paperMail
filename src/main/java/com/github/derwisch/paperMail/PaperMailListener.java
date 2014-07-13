@@ -106,7 +106,7 @@ public class PaperMailListener implements Listener {
         	ItemCost = ItemCost + sendAmount;
         }
     	if (currentItemMeta != null && currentItemMeta.getDisplayName() == PaperMailGUI.SEND_BUTTON_ON_TITLE) {
-    		if (((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && ((sendAmount > 1) && Settings.EnableSendMoney)) || ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && ((sendAmount == 0) && Settings.EnableSendMoney == false))){
+    		if (((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && ((sendAmount > 1) && Settings.EnableSendMoney)) || ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)) && ((sendAmount == 0) || Settings.EnableSendMoney == false))){
     			if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
                 	cancel = false;
                 }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
@@ -114,17 +114,17 @@ public class PaperMailListener implements Listener {
                     cancelSend(event, itemMailGUI);
             		cancel = true;
                 }
-            }else if((Settings.EnableSendMoney == false || sendAmount == 0) && ((Settings.EnableMailCosts == true) && (writtenBookBoolean) && (ItemCost != 0) && (!player.hasPermission(Permissions.COSTS_EXEMPT)))){
-            	if (PaperMailEconomy.hasMoney(ItemCost, player) == true){
-                	cancel = false;
-                }else if(PaperMailEconomy.hasMoney(ItemCost, player) == false){
-                    player.sendMessage(ChatColor.RED + "Not enough money to send your mail, mail not sent!");
-                    cancelSend(event, itemMailGUI);
-            		cancel = true;
-                }
+            }else if(player.hasPermission(Permissions.COSTS_EXEMPT) && (PaperMailEconomy.hasMoney(sendAmount, player) && (Settings.EnableMailCosts == true) && ((sendAmount > 1) && Settings.EnableSendMoney)))
+            {
+            	cancel = false;
             }
-			//   STILL NEED TO CHECK TO SEE IF SENDING MONEY AND MAILCOSTS IS ENABLED IF THERE IS MONEY TO DO BOTH
-    		if(((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1)) && (writtenBookBoolean) && ((Settings.EnableItemMail == false) || ItemCost == 0 || player.hasPermission(Permissions.COSTS_EXEMPT)))
+    		if(player.hasPermission(Permissions.COSTS_EXEMPT) && (!PaperMailEconomy.hasMoney(sendAmount, player) && (Settings.EnableMailCosts == true) && ((sendAmount > 1) && Settings.EnableSendMoney)))
+    		{
+    			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have. Mail not sent." + ChatColor.RESET);
+    			cancelSend(event, itemMailGUI);
+        		cancel = true;
+    		}
+    		if(((Settings.EnableSendMoney == true) && (PaperMailEconomy.hasMoney(sendAmount, player) == false) && (sendAmount > 1)) && (writtenBookBoolean) && ((Settings.EnableMailCosts == false) || ItemCost == 0 || player.hasPermission(Permissions.COSTS_EXEMPT)))
     		{
     			player.sendMessage(ChatColor.DARK_RED + "You are trying to send more money than you have. Mail not sent." + ChatColor.RESET);
     			cancelSend(event, itemMailGUI);
@@ -138,6 +138,7 @@ public class PaperMailListener implements Listener {
             if(writtenBookBoolean && ((Settings.EnableMailCosts == false) || (Settings.ItemCost == 0) || player.hasPermission(Permissions.COSTS_EXEMPT)) && ((Settings.EnableSendMoney == false) || (((Settings.EnableSendMoney == true) && (sendAmount == 0)))) && (cancel != true)) {
             	cancel = false;
     		}
+            
             if (cancel != true)
             {
             	sendMail(itemMailGUI, event, inventory);

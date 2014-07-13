@@ -6,13 +6,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+
+
+
+
 //    minecraft internals
-import net.minecraft.server.v1_7_R3.NBTCompressedStreamTools;
-import net.minecraft.server.v1_7_R3.NBTTagCompound;
-import net.minecraft.server.v1_7_R3.NBTTagList;
+import net.minecraft.server.v1_7_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_7_R1.NBTTagCompound;
+import net.minecraft.server.v1_7_R1.NBTTagList;
+
+
+
+
+
 //    bukkit/craftbukkit imports
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -20,7 +31,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +39,7 @@ import org.bukkit.inventory.ItemStack;
 public class Inbox {
 	
 	public static ArrayList<Inbox> Inboxes = new ArrayList<Inbox>();
+	
 	
 	public static void SaveAll() throws IOException {
 		for (Inbox inbox : Inboxes) {
@@ -71,6 +83,7 @@ public class Inbox {
 	private ConfigAccessor configAccessor;
 	private File file;
 	private File yamlfile;
+	
 	public Inbox(String playerName) throws IOException, InvalidConfigurationException {
 		this.playerName = playerName;
 		String filename = playerName + ".txt";
@@ -87,6 +100,7 @@ public class Inbox {
 	}
 	
 	private void initMailBox() {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		this.inventory = Bukkit.createInventory(player, 36, PaperMail.INBOX_GUI_TITLE);
 	}
@@ -152,7 +166,7 @@ public class Inbox {
 			  if(item != null)
 			  {
 				  int index = item.getInt("index");
-				  net.minecraft.server.v1_7_R3.ItemStack is = net.minecraft.server.v1_7_R3.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
+				  net.minecraft.server.v1_7_R1.ItemStack is = net.minecraft.server.v1_7_R1.ItemStack.createStack(item); //net.minecraft.server item stack, not bukkit item stack
 				  cis = CraftItemStack.asCraftMirror(is);
 				  if (InventoryUtils.inventoryCheck(inventory, cis) == true)
 				  {
@@ -201,6 +215,7 @@ public class Inbox {
 	}
 	
 	public void openInbox() {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		
 		player.openInventory(inventory);
@@ -213,7 +228,10 @@ public class Inbox {
 	
 	
 	public void AddItem(ItemStack itemStack, Player sender) throws IOException, InvalidConfigurationException {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
+		World world = sender.getWorld();
+		Location senderLocation = sender.getLocation();
 		if (inboxChest != null) {
 			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
 				if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
@@ -223,7 +241,7 @@ public class Inbox {
 							player.getInventory().addItem(itemStack);
 							
 						}else {
-							sender.getWorld().dropItemNaturally(sender.getLocation(), itemStack);
+							world.dropItemNaturally(senderLocation, itemStack);
 							  }
 						}
 					}
@@ -237,7 +255,7 @@ public class Inbox {
 					player.getInventory().addItem(itemStack);
 					}
 				}else{
-					sender.getWorld().dropItemNaturally(sender.getLocation(), itemStack);
+					world.dropItemNaturally(senderLocation, itemStack);
 				}
 			}
 		}
@@ -245,6 +263,7 @@ public class Inbox {
 	}
 	
 	public void AddItems(Collection<ItemStack> items, Player sender) throws IOException, InvalidConfigurationException {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		@SuppressWarnings("unused")
 		boolean full = true;
