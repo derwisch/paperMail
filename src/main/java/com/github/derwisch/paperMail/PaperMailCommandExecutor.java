@@ -136,7 +136,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 		sender.sendMessage(ChatColor.GOLD + "/sendtext <playername> <Composition of Text>" + ChatColor.RESET);
 		sender.sendMessage(ChatColor.YELLOW + "playername must be exact if sending to an offline player" + ChatColor.RESET);
 		sender.sendMessage(ChatColor.GOLD + "/createbox" + ChatColor.RESET);
-		sender.sendMessage(ChatColor.YELLOW + "Creates extra storage for your mail items. Do this while looked at a chest." + ChatColor.RESET);
+		sender.sendMessage(ChatColor.YELLOW + "Creates extra storage for your mail items. Do this while looking at a chest." + ChatColor.RESET);
 	}
 	
 	//Send the textmail

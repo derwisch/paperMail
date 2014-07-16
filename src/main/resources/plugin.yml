@@ -14,8 +14,8 @@ commands:
       usage: /<command> <to> <message>
       aliases: [st]   
    createbox:
-      description: Creates a chest for the player that stores extra items from mailbox
-      usage: /<command> <focus on chest>
+      description: Creates a chest out of the focused chest for the player that stores extra items from mailbox
+      usage: /<command>
       aliases: [mailchest]      
 permissions:
     papermail.*:
