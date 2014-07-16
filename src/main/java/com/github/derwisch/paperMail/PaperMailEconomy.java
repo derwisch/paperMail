@@ -12,11 +12,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class PaperMailEconomy{
 	public static boolean hasMoney = true;
 
-	/*Count the total number of Gold Ingots in Inventory if using Gold Ingot System*/
-    public static int goldCounter(Player player){    
+	/*Count the total number of Currency Items in Inventory if using the Built in Economy*/
+    public static int goldCounter(Player player, Material currencyItem){    
 	  int gold = 0;
 	  for (ItemStack i : player.getInventory()) {
-		  if ((i != null) && (i.getType() == Material.GOLD_INGOT)){
+		  if ((i != null) && (i.getType() == currencyItem)){
 				int counter = 0;
 				counter = i.getAmount();
 				gold = gold + counter;
@@ -25,13 +25,13 @@ public class PaperMailEconomy{
 	  return gold;
 		}
   
-    /*Take Gold Ingots from Inventory if using Gold Ingot System*/
+    /*Take Currency Items from Inventory if using the Built in Economy*/
     @SuppressWarnings("deprecation")
-	public static void takeGold(int Price, Player player){    
+	public static void takeGold(int Price, Player player, Material currencyItem){    
 	  int change;
 	  int goldLeft = Price;
 	  for (ItemStack i : player.getInventory().getContents()){
-		  if ((i != null) && (i.getType() == Material.GOLD_INGOT)){
+		  if ((i != null) && (i.getType() == currencyItem)){
 			  if (i.getAmount() >= goldLeft){
 				  change = i.getAmount() - goldLeft;
 				  if(change == 0)
@@ -55,30 +55,37 @@ public class PaperMailEconomy{
 	}
     
     //take money from the player
-    public static void takeMoney(Double price, Player player){
+    @SuppressWarnings({ "deprecation" })
+	public static void takeMoney(Double price, Player player){
     if (!(PaperMail.isGoldIngot())) {
 				PaperMail.economy.withdrawPlayer(player.getName(), price.doubleValue());
-				player.sendMessage(ChatColor.GREEN + "%price% removed from Wallet!".replace("%price%", new StringBuilder().append(ChatColor.WHITE).append(price.toString()).toString()));   
+				player.sendMessage(ChatColor.GREEN + "%price% removed from Wallet!".replace("%price%", new StringBuilder().append(ChatColor.WHITE).append(price.toString()).toString()) + ChatColor.RESET);   
     }
    else {
+	   String currencyName = Material.getMaterial(Settings.CurrencyItemID).toString();
        int goldPrice = (int)Math.ceil(price.doubleValue());  
-       takeGold(goldPrice, player);
+       takeGold(goldPrice, player, Material.getMaterial(Settings.CurrencyItemID));
        StringBuilder sb = new StringBuilder();
        sb.append("");
        sb.append(goldPrice);
-       player.sendMessage(ChatColor.GREEN + "%price% Gold Ingots removed from Inventory!".replace("%price%", sb.append(ChatColor.WHITE)).toString());    
+       StringBuilder sb1 = new StringBuilder();
+       sb1.append("");
+       sb1.append(currencyName);
+       currencyName = sb1.toString().replace("_", " ");
+       player.sendMessage(ChatColor.WHITE + "%price%".replace("%price%", sb.append(ChatColor.WHITE)).toString() + " " + ChatColor.YELLOW + "%currencyName%".replace("%currencyName%", currencyName) + ChatColor.GREEN + " " + "removed from Inventory!" + ChatColor.RESET);    
       }
     }
     
     //check if player has correct amount of currency, return true if they do, false if they don't
-    public static boolean hasMoney(Double price, Player player){
+    @SuppressWarnings("deprecation")
+	public static boolean hasMoney(Double price, Player player){
 	  if ((!(PaperMail.isGoldIngot())) && (Settings.EnableMailCosts != false) && (price != 0)) {
 		  if (PaperMail.economy.getBalance(player.getName()) < price.doubleValue()) {
 		  		hasMoney = false;
 		  		return false;
 				 }
 	  }else if((PaperMail.isGoldIngot()) && (Settings.EnableMailCosts != false) && (price != 0)){
-		  int goldAmount = goldCounter(player);
+		  int goldAmount = goldCounter(player, Material.getMaterial(Settings.CurrencyItemID));
 		  int goldPrice = (int)Math.ceil(price.doubleValue());
 		  if (goldAmount < goldPrice) {
 		         hasMoney = false;
@@ -109,8 +116,22 @@ public class PaperMailEconomy{
 	}
     
     //Deposit the banknote into the player's bank account
-    public static void cashBankNote(Player player, double amount){
+    @SuppressWarnings("deprecation")
+	public static void cashBankNote(Player player, double amount){
+      if (!(PaperMail.isGoldIngot())) {
 	  String playerName = player.getName();
 	  PaperMail.economy.depositPlayer(playerName, amount);
+      }else
+      {
+    	  int currencyAmt = (int)amount;
+    	  ItemStack currencyItem = new ItemStack(Material.getMaterial(Settings.CurrencyItemID), currencyAmt);
+    	  if(InventoryUtils.inventoryCheck(player, currencyItem)){
+    		  player.getInventory().addItem(currencyItem);
+    	  }else
+    	  {
+    		  player.sendMessage(ChatColor.RED + "Not Enough Room in your Inventory to Deposit this BankNote." + ChatColor.RESET);
+    	  }
+      }
+      
   }
 }

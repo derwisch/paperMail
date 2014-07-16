@@ -69,7 +69,7 @@ public class InventoryUtils
 			e.printStackTrace();
 			return null;
 		}
-	}
+	}	
 
 	protected static Object getNMSCopy(ItemStack stack) {
     	Object nms = null;

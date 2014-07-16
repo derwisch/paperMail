@@ -46,11 +46,13 @@ public class PaperMail extends JavaPlugin {
     	if (setupEconomy().booleanValue())
     		System.out.println(this + " linked into " + economy.getName() + ", via Vault");
         if ((setupEconomy() == false) && (Settings.EnableMailCosts == true)) {
-        	System.out.println(this + ": Vault economy not found, switching to gold ingots!");
+        	System.out.println(this + ": Vault economy not found, switching to Default Economy!");
         }
     	
     	PaperMailCommandExecutor commandExecutor = new PaperMailCommandExecutor(this); 
     	getCommand("papermail").setExecutor(commandExecutor);
+    	getCommand("sendtext").setExecutor(commandExecutor);
+    	getCommand("createbox").setExecutor(commandExecutor);
     	
     	listener = new PaperMailListener();
         this.getServer().getPluginManager().registerEvents(listener, this);

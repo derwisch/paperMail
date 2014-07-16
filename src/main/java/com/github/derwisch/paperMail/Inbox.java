@@ -1,11 +1,13 @@
 package com.github.derwisch.paperMail;
-
+//general Java imports
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+
 
 
 
@@ -16,8 +18,12 @@ import net.minecraft.server.v1_7_R1.NBTTagList;
 
 
 
+
+
 //    bukkit/craftbukkit imports
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -33,6 +39,7 @@ import org.bukkit.inventory.ItemStack;
 public class Inbox {
 	
 	public static ArrayList<Inbox> Inboxes = new ArrayList<Inbox>();
+	
 	
 	public static void SaveAll() throws IOException {
 		for (Inbox inbox : Inboxes) {
@@ -76,7 +83,7 @@ public class Inbox {
 	private ConfigAccessor configAccessor;
 	private File file;
 	private File yamlfile;
-	private File queueFile;
+	
 	public Inbox(String playerName) throws IOException, InvalidConfigurationException {
 		this.playerName = playerName;
 		String filename = playerName + ".txt";
@@ -93,6 +100,7 @@ public class Inbox {
 	}
 	
 	private void initMailBox() {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		this.inventory = Bukkit.createInventory(player, 36, PaperMail.INBOX_GUI_TITLE);
 	}
@@ -112,52 +120,20 @@ public class Inbox {
 	
 	private void loadItems() throws IOException, InvalidConfigurationException {
 		int i = 0;
-		int n = 0;
 		ItemStack oldstack = null;
 		ItemStack stack = null;
-		ItemStack queueStack = null;
 		String itemString = null;
-		String queueString = null;
-		String queueName = playerName + "Queue" + ".yml";
 		//Load Current stack save format
 		YamlConfiguration yaml = new Utf8YamlConfiguration();
-		YamlConfiguration queueYaml = new Utf8YamlConfiguration();
-		queueFile = new File(PaperMail.instance.getDataFolder(), "players\\" + queueName);
-		if(!queueFile.exists())
-			queueYaml.save(queueFile);
 		yaml.load(yamlfile);
-		queueYaml.load(queueFile);
 		do {
-			  queueString = queueYaml.getString("newitemstack." + n);
 			  itemString = yaml.getString("newitemstack." + i);
-		      if (itemString != null) {
+			  if (itemString != null) {
 		        stack = InventoryUtils.stringToItemStack(itemString);
-		      }
-		      if (queueString != null) {
-			        queueStack = InventoryUtils.stringToItemStack(queueString);
-			  }
-		      if (stack != null) {
-		    	  if (InventoryUtils.inventoryCheck(this.inventory, stack) == true)
-					{
-		    	  	this.inventory.addItem(stack);
-					}else{
-						saveQueue(playerName, (CraftItemStack) stack);
-					}
-		      }else{
-		    	  if(queueStack != null){
-		    	  if (InventoryUtils.inventoryCheck(this.inventory, queueStack) == true)
-					{
-		    	  	this.inventory.addItem(queueStack);
-		    	  	queueYaml.set("newitemstack." + n, "");
-		    	  	n++;
-					}else{
-						saveQueue(playerName, (CraftItemStack) queueStack);
-					} 
-		      }
+		        inventory.addItem(stack);
 		      }
 		      i++;
-		    }while (((queueString != null) && (itemString != null)));
-		queueYaml.save(queueFile);
+		    }while (itemString != null);
 		i = 0;
 		//Load old old stacks for conversion, set slots to empty after load
 		do {
@@ -239,6 +215,7 @@ public class Inbox {
 	}
 	
 	public void openInbox() {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
 		
 		player.openInventory(inventory);
@@ -249,20 +226,26 @@ public class Inbox {
 		saveChest();
 	}
 	
+	
 	public void AddItem(ItemStack itemStack, Player sender) throws IOException, InvalidConfigurationException {
+		@SuppressWarnings("deprecation")
 		Player player = Bukkit.getServer().getPlayer(playerName);
+		World world = sender.getWorld();
+		Location senderLocation = sender.getLocation();
 		if (inboxChest != null) {
 			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
 				if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
-					if((player != null) && (itemStack != null))
-					if (InventoryUtils.inventoryCheck(player.getInventory(), itemStack) == true)
-					{
-					player.getInventory().addItem(itemStack);
-					}else{
-						saveQueue(playerName, (CraftItemStack) itemStack);
+					if((player != null) && (itemStack != null)){
+						if (InventoryUtils.inventoryCheck(player.getInventory(), itemStack) == true)
+						{
+							player.getInventory().addItem(itemStack);
+							
+						}else {
+							world.dropItemNaturally(senderLocation, itemStack);
+							  }
+						}
 					}
 				}
-			}
 		} else {
 			if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
 				if((player != null) && (itemStack != null))
@@ -270,20 +253,30 @@ public class Inbox {
 				if (InventoryUtils.inventoryCheck(player.getInventory(), itemStack) == true)
 					{
 					player.getInventory().addItem(itemStack);
-					}else{
-						saveQueue(playerName, (CraftItemStack) itemStack);
 					}
+				}else{
+					world.dropItemNaturally(senderLocation, itemStack);
 				}
 			}
 		}
-		
 		saveItems();
 	}
 	
 	public void AddItems(Collection<ItemStack> items, Player sender) throws IOException, InvalidConfigurationException {
+		@SuppressWarnings("deprecation")
+		Player player = Bukkit.getServer().getPlayer(playerName);
+		@SuppressWarnings("unused")
+		boolean full = true;
 		for (ItemStack itemStack : items) {
-			AddItem(itemStack, sender);
+					AddItem(itemStack, sender);
+			if((player != null) && (itemStack != null)){
+					full = InventoryUtils.inventoryCheck(player.getInventory(), itemStack);
+			}
 		}
+		if(full = false){
+			sender.sendMessage(ChatColor.DARK_RED + "The Recipient does not have enough space for some of your items. Check the ground for items not sent." + ChatColor.RESET);
+		}
+		sender.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);
 	}
 	//Loads a string from a yaml file with a section name(string) and index number(int)
 	public static String loadStringFromYaml(File file,int index, String section) throws IOException, InvalidConfigurationException {
@@ -302,29 +295,5 @@ public class Inbox {
 	public void SaveInbox() throws IOException {
 		saveItems();
 		saveChest();
-	}
-	
-	public void saveQueue(String playerName, CraftItemStack itemStack) throws IOException, InvalidConfigurationException {
-			String itemString = "";
-			int n = 0;
-			String yamlname = playerName + "Queue" + ".yml";
-			queueFile = new File(PaperMail.instance.getDataFolder(), "players\\" + yamlname);
-			YamlConfiguration yaml = new Utf8YamlConfiguration();
-			String item = InventoryUtils.itemstackToString(itemStack);
-			if(queueFile.exists()){
-				yaml.load(queueFile);
-				//get current placeholder number
-				do {
-					itemString = yaml.getString("newitemstack." + n);
-			      if (itemString != null) {
-			        n++;
-			      }
-			    }while ((itemString != null));
-				n++;
-			}
-				if (item != null) {
-					yaml.set("newitemstack." + n, item);
-				}
-		yaml.save(queueFile);
 	}
 }
