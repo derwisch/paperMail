@@ -1,4 +1,4 @@
-package com.github.derwisch.paperMail;
+package com.github.derwisch.paperMail.configs;
 
 /*
 * Copyright (C) 2012
@@ -24,7 +24,6 @@ package com.github.derwisch.paperMail;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,11 +38,10 @@ public class ConfigAccessor {
     private File configFile;
     private FileConfiguration fileConfiguration;
 
-    @SuppressWarnings("deprecation")
-	public ConfigAccessor(JavaPlugin plugin, String fileName) {
+    public ConfigAccessor(JavaPlugin plugin, String fileName) {
         if (plugin == null)
             throw new IllegalArgumentException("plugin cannot be null");
-        if (!plugin.isInitialized())
+        if (!plugin.isEnabled())
             throw new IllegalArgumentException("plugin must be initiaized");
         this.plugin = plugin;
         this.fileName = fileName;
@@ -58,12 +56,7 @@ public class ConfigAccessor {
         }
         fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
 
-        // Look for defaults in the jar
-        InputStream defConfigStream = plugin.getResource(fileName);
-        if (defConfigStream != null) {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            fileConfiguration.setDefaults(defConfig);
-        }
+        plugin.saveDefaultConfig();
     }
 
     public FileConfiguration getConfig() {

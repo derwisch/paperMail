@@ -1,0 +1,22 @@
+## Custom Mailbox Config ##
+## Head URLs *MUST* come from http://textures.minecraft.net/texture/ ##
+## 
+
+CobbleStoneMailbox:
+  headURL: "http://textures.minecraft.net/texture/78cb989ef29c734fe05a95bfa15af08abbb64a173ea32f0f6f06d6e34f9bd38"
+  recipe:
+    item1: COBBLESTONE
+    item2: COBBLESTONE
+    item3: COBBLESTONE
+    item4: COBBLESTONE
+    item5: PAPER
+    item6: COBBLESTONE
+    item7: COBBLESTONE
+    item8: COBBLESTONE
+    item9: COBBLESTONE
+  permission:
+  displayname: '&7Cobblestone &fLetterbox'
+  lore:
+  - '&3this is some lore about this mailbox'
+  - '&2this is the second line of lore about this mailbox'
+  
