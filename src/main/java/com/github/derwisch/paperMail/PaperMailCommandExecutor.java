@@ -1,6 +1,7 @@
 package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.derwisch.paperMail.configs.Settings;
+import com.github.derwisch.paperMail.recipes.WritingPaper;
 import com.github.derwisch.paperMail.utils.UUIDUtils;
 
 public class PaperMailCommandExecutor implements CommandExecutor {
@@ -33,15 +35,12 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 				sender.sendMessage("Current Version of PaperMail is " + PaperMail.instance.getDescription().getVersion());
 				return true;
 			} else {
+				Player player = (Player) sender;
 				if (args.length == 0) {
 					sender.sendMessage("Current Version of PaperMail is " + PaperMail.instance.getDescription().getVersion());
 					return true;
-				}
-				
-				Player player = (Player) sender;
-				
-				
-				if (!args[0].toLowerCase().equals("sendtext") && !args[0].toLowerCase().equals("createbox")) {
+				}						
+				if (!args[0].toLowerCase().equals("sendtext")) {
 					player.sendMessage(ChatColor.DARK_RED + "invalid argument \"" + args[0] + "\"" + ChatColor.RESET);
 					return true;
 				}
@@ -62,71 +61,30 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					}
 					
 					UUID uid = UUIDUtils.getUUIDfromPlayerName(args[1]);
-					
-					ItemStack itemStack = new ItemStack(Material.PAPER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					
-					itemMeta.setDisplayName(ChatColor.WHITE + "Letter from " + player.getName() + ChatColor.RESET);
-					ArrayList<String> lines = new ArrayList<String>();
-					
+					ItemStack letterpaper = new ItemStack(Material.PAPER, 1);
+	        		ItemMeta letterMeta = letterpaper.getItemMeta();
+	        		letterMeta.setDisplayName(args[1] + WritingPaper.secretCode);
+	        		List<String> letterLore = new ArrayList<String>();
 					int count = 0;
-					String currentLine = "";
-					
+					String currentLine = "";				
 					for (int i = 2; i < args.length; i++) {
 						currentLine += args[i] + " ";
 						count += args[i].length() + 1;
 						if (++count >= 20) {
 							count = 0;
-							lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);
+							letterLore.add(ChatColor.translateAlternateColorCodes('&', ("&7&o" + currentLine + "&r")));
 							currentLine = "";
 						}
-					}
-					
+					}				
 					if (currentLine != "") {
-						lines.add(ChatColor.GRAY + currentLine + ChatColor.RESET);	
+						letterLore.add(ChatColor.translateAlternateColorCodes('&', ("&7&o" + currentLine + "&r")));	
 					}
-					
-					itemMeta.setLore(lines);
-					itemStack.setItemMeta(itemMeta);
-					
-					Inbox.GetInbox(uid).AddItem(itemStack, player);
-
+					letterLore.add(ChatColor.translateAlternateColorCodes('&', (Settings.LetterSignature + player.getName())));
+	        		letterMeta.setLore(letterLore);
+	        		letterpaper.setItemMeta(letterMeta);				
+					Inbox.GetInbox(uid).AddItem(letterpaper);
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					return true;
-				}
-
-				if (args[0].toLowerCase().equals("createbox")) {
-					Inbox inbox;
-					
-					if (args.length == 1 && (player.hasPermission(Permissions.CREATE_CHEST_SELF_PERM)  || player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM))) {
-						inbox = Inbox.GetInbox(player.getUniqueId());
-					} else if (args.length == 2 && player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)) {
-						if(UUIDUtils.getUUIDfromPlayerName(args[1])==null){
-							player.sendMessage(ChatColor.DARK_RED + "You can't create a mailbox for someone who doesn't exist!" + ChatColor.RESET);
-							return true;
-						}
-						inbox = Inbox.GetInbox(UUIDUtils.getUUIDfromPlayerName(args[1]));
-					} else {
-						player.sendMessage(ChatColor.DARK_RED + "Too many arguments!" + ChatColor.RESET);
-						return true;
-					}
-					
-					Block block = player.getTargetBlock(null, 10);
-					
-					if (block != null && block.getType() == Material.CHEST) {
-
-						
-						Chest chest = (Chest)block.getState();
-						
-						inbox.SetChest(chest);
-						
-						player.sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
-						return true;
-					} else {
-						player.sendMessage(ChatColor.DARK_RED + "You must focus a chest" + ChatColor.RESET);
-						return true;
-					}
-					
 				}
 			}
 			return true;

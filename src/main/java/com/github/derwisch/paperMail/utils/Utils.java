@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class Utils{
@@ -17,5 +18,18 @@ public class Utils{
 			matList.add(Material.valueOf(s.toUpperCase()));
 		}
 		return matList;
+	}
+	
+	public static boolean areLocationsEqual(Location one, Location two){
+		if(one.getWorld() == two.getWorld()){
+			if(one.getBlockX() == two.getBlockX()){
+				if(one.getBlockY() == two.getBlockY()){
+					if(one.getBlockZ() == two.getBlockZ()){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

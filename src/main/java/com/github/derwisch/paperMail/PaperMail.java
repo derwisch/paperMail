@@ -1,23 +1,20 @@
 package com.github.derwisch.paperMail;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.derwisch.paperMail.configs.CustomMailboxConfig;
 import com.github.derwisch.paperMail.configs.Settings;
+import com.github.derwisch.paperMail.configs.WritingPaperConfig;
+import com.github.derwisch.paperMail.listeners.PaperMailListener;
 import com.github.derwisch.paperMail.recipes.CustomMailboxes;
-import com.github.derwisch.paperMail.recipes.LetterPaper;
+import com.github.derwisch.paperMail.recipes.WritingPaper;
 
 public class PaperMail extends JavaPlugin {
 	  
@@ -30,6 +27,7 @@ public class PaperMail extends JavaPlugin {
 	private PaperMailListener listener;
 	private FileConfiguration configuration;
 	private CustomMailboxConfig mailboxConfig;
+	private WritingPaperConfig writingpaperConfig;
 	private CustomMailboxes customMailboxes;
 	
     @Override
@@ -62,10 +60,12 @@ public class PaperMail extends JavaPlugin {
     	getLogger().info("Disabled PaperMail");
     }
     
-    private void initializeRecipes() {
-		new LetterPaper(instance).registerLetterPaper();
+    private void initializeRecipes() {		
 		mailboxConfig = new CustomMailboxConfig(instance);
 		mailboxConfig.initMailBoxConfig();
+		writingpaperConfig = new WritingPaperConfig(instance);
+		writingpaperConfig.initWritingPaperConfig();
+		new WritingPaper(instance).registerWritingPaper();
 		customMailboxes = new CustomMailboxes(instance, mailboxConfig.getCustomMailboxes());
 		customMailboxes.registerMailboxes();
     }
@@ -88,4 +88,8 @@ public class PaperMail extends JavaPlugin {
 			}			
 		}
 	}
+    
+    public FileConfiguration getConfiguration(){
+    	return this.configuration;
+    }
 }

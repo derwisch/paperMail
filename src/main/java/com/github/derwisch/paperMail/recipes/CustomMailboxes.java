@@ -19,6 +19,7 @@ public class CustomMailboxes
 {
 	private PaperMail plugin;
 	private List<CustomMailbox> customMailBoxes;
+	public final static String secretCode = ChatColor.translateAlternateColorCodes('&', "&6&6&6&r");
 	
 	public CustomMailboxes(PaperMail plugin, List<CustomMailbox> customMailBoxes){
 		this.plugin = plugin;
@@ -26,7 +27,6 @@ public class CustomMailboxes
 	}
 	
 	public void registerMailboxes(){
-		String secretCode = ChatColor.translateAlternateColorCodes('&', "&6&6&6");
 		for(CustomMailbox c : this.customMailBoxes){
 			ItemStack mailbox = SkullUtils.getCustomSkull(c.getUrl());
 			ItemMeta mailBoxMeta = mailbox.getItemMeta();
@@ -50,4 +50,18 @@ public class CustomMailboxes
 			Bukkit.getLogger().info(key + " Successfully Registered");
 		}		
 	}
+	
+	public static boolean hasSecretCode(ItemStack stack){
+    	if(stack!=null && stack.hasItemMeta()){
+    		ItemMeta meta = stack.getItemMeta();
+    		if(meta!=null){
+    			if(meta.hasDisplayName()){
+    				if(meta.getDisplayName().contains(secretCode)){
+        				return true;
+        			}
+    			}   			
+    		}
+    	}
+    	return false;
+    }
 }

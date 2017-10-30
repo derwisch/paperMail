@@ -15,16 +15,15 @@ public class Settings {
 	public static boolean EnableTextMail = true;
 	public static boolean EnableItemMail = true;
 	public static boolean EnableEnderchest = true;
-
+	public static boolean EnableCustomMailboxes = true;
+	
 	public static int MailWindowRows = 3;
 	public static int DefaultBoxRows = 4;
 	
 	public static Material EnderChestRequirementID = Material.ENDER_PEARL;
 	public static int EnderChestRequirementDV = 0;
 	
-	public static Material MailItemID = Material.PAPER;
-	public static int MailItemDV = 1;
-	public static String MailItemName = "Letter paper";
+	public static String LetterSignature = "&7&oSincerely, ";
 	
 	public static List<UUID> InboxPlayers = new ArrayList<UUID>();
 	
@@ -36,13 +35,8 @@ public class Settings {
         	EnableTextMail = config.getBoolean("general.EnableTextMail");
         	EnableItemMail = config.getBoolean("general.EnableItemMail");
         	EnableEnderchest = config.getBoolean("general.EnableEnderchest");
-        	if(Material.getMaterial(config.getString("general.MailItemID").toUpperCase()) != null){
-        		MailItemID = Material.getMaterial(config.getString("general.MailItemID").toUpperCase());
-        	}
-        	
-        	MailItemDV = config.getInt("general.MailItemDV");
-        	MailItemName = config.getString("general.MailItemName");
-        	
+        	EnableCustomMailboxes = config.getBoolean("general.EnableCustomMailboxes");
+        	LetterSignature = config.getString("messages.LetterSignature");
         	if(!config.getStringList("inboxPlayers").isEmpty() && config.getStringList("inboxPlayers")!=null){
         		InboxPlayers = UUIDUtils.getUUIDListfromStringList(config.getStringList("inboxPlayers"));
         	}      	
@@ -58,10 +52,9 @@ public class Settings {
     	config.set("general.EnableTextMail", EnableTextMail);
     	config.set("general.EnableItemMail", EnableItemMail);
     	config.set("general.EnableEnderchest", EnableEnderchest);
+    	config.set("general.EnableCustomMailboxes", EnableCustomMailboxes);
     	
-    	config.set("general.MailItemID", MailItemID.toString());
-    	config.set("general.MailItemDV", MailItemDV);
-    	config.set("general.MailItemName", MailItemName);
+    	config.set("messages.LetterSignature", LetterSignature);
     	
     	config.set("inboxPlayers", UUIDUtils.getStringListfromUUIDList(InboxPlayers));
     }

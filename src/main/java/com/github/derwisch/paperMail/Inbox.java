@@ -3,6 +3,7 @@ package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.block.Skull;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -20,7 +22,7 @@ import com.github.derwisch.paperMail.configs.Settings;
 
 public class Inbox {
 	
-	public static ArrayList<Inbox> Inboxes = new ArrayList<Inbox>();
+	public static List<Inbox> Inboxes = new ArrayList<Inbox>();
 	
 	public static void SaveAll() {
 		for (Inbox inbox : Inboxes) {
@@ -56,7 +58,7 @@ public class Inbox {
 	
 	public UUID playerUUID;
 	public Inventory inventory;
-	public Chest inboxChest;
+	public Collection<Block> inboxChests;
 	
 	private FileConfiguration playerConfig;
 	private ConfigAccessor configAccessor;
@@ -66,7 +68,7 @@ public class Inbox {
 		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + uuid + ".yml");
 		this.playerConfig = configAccessor.getConfig();
 		configAccessor.saveConfig();
-		
+		this.inboxChests = new ArrayList<Block>();
 		initMailBox();
 		loadChest();
 		loadItems();
@@ -78,16 +80,21 @@ public class Inbox {
 	}
 	
 	private void loadChest() {
-		String worldName = playerConfig.getString("chest.world");
-		worldName = (worldName != null) ? worldName : "";
-		World world = Bukkit.getWorld(worldName);
-		int x = playerConfig.getInt("chest.x");
-		int y = playerConfig.getInt("chest.y");
-		int z = playerConfig.getInt("chest.z");
+		for(String s : playerConfig.getKeys(false)){
+			if(s.contains("chest")){
+				String worldName = playerConfig.getString(s + ".world");
+				worldName = (worldName != null) ? worldName : "";
+				World world = Bukkit.getWorld(worldName);
+				int x = playerConfig.getInt(s + ".x");
+				int y = playerConfig.getInt(s + ".y");
+				int z = playerConfig.getInt(s + ".z");
 
-		Block block = (world != null) ? world.getBlockAt(x, y, z) : null;
+				Block block = (world != null) ? world.getBlockAt(x, y, z) : null;
+				if(block != null && (block.getType() == Material.CHEST || block.getState() instanceof Skull))
+				inboxChests.add(block);
+			}			
+		}
 		
-		inboxChest = (block != null && block.getType() == Material.CHEST) ? (Chest)block.getState() : null; 
 	}
 	
 	private void loadItems() {
@@ -95,35 +102,36 @@ public class Inbox {
 		ItemStack stack = null;
 		do {
 			stack = playerConfig.getItemStack("itemstack." + i);
-			if (stack != null) {
+			if (stack != null && stack.getType() != Material.AIR) {
 				inventory.addItem(stack);
 			}
 			i++;
 		} while (stack != null);
 	}
 
-	private void saveChest() {
-		if (inboxChest == null) {
+	private void saveChests() {
+		if (inboxChests == null || inboxChests.isEmpty()) {
 			return;
 		}
-		
-		String worldName = inboxChest.getLocation().getWorld().getName();
-		int x = inboxChest.getLocation().getBlockX();
-		int y = inboxChest.getLocation().getBlockY();
-		int z = inboxChest.getLocation().getBlockZ();
-
-		 playerConfig.set("chest.world", worldName);
-		 playerConfig.set("chest.x", x);
-		 playerConfig.set("chest.y", y);
-		 playerConfig.set("chest.z", z);
-
-		 configAccessor.saveConfig();
+		int i = 0;
+		for(Block b : inboxChests){
+			i++;
+			String worldName = b.getLocation().getWorld().getName();
+			int x = b.getLocation().getBlockX();
+			int y = b.getLocation().getBlockY();
+			int z = b.getLocation().getBlockZ();
+			playerConfig.set("chest" + i + ".world", worldName);
+			playerConfig.set("chest" + i + ".x", x);
+			playerConfig.set("chest" + i + ".y", y);
+			playerConfig.set("chest" + i + ".z", z);
+		}
+		configAccessor.saveConfig();
 	}
 	
 	private void saveItems() {
 		for (int i = 0; i < Settings.DefaultBoxRows * 9; i++) {
 			ItemStack stack = inventory.getItem(i);
-			if (stack != null) {
+			if (stack != null && stack.getType()!=Material.AIR) {
 				playerConfig.set("itemstack." + i, stack);
 			}
 		}
@@ -137,36 +145,41 @@ public class Inbox {
 		player.openInventory(inventory);
 	}
 	
-	public void SetChest(Chest newChest) {
-		inboxChest = newChest;
-		saveChest();
+	public void addChest(Block newChest) {
+		inboxChests.add(newChest);
+		saveChests();
 	}
 	
-	public void AddItem(ItemStack itemStack, Player sender) {
+	public void AddItem(ItemStack itemStack) {
 		Player player = Bukkit.getServer().getPlayer(playerUUID);
-		if (inboxChest != null) {
-			if (inboxChest.getInventory().addItem(itemStack).keySet().toArray().length > 0) {
-				if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
-					player.getInventory().addItem(itemStack);
+		for(Block inboxChest : inboxChests){
+			if(inboxChest!=null){
+				if (inboxChest.getState() instanceof Chest) {
+					if (((Chest)inboxChest).getInventory().addItem(itemStack).keySet().toArray().length > 0) {
+						if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
+							player.getInventory().addItem(itemStack);
+							return;
+						}
+					}
+				} else{
+					if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
+						player.getInventory().addItem(itemStack);
+						return;
+					}
 				}
-			}
-		} else {
-			if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
-				player.getInventory().addItem(itemStack);
-			}
-		}
-		
+			}		
+		}		
 		saveItems();
 	}
 	
-	public void AddItems(Collection<ItemStack> items, Player sender) {
+	public void AddItems(Collection<ItemStack> items) {
 		for (ItemStack itemStack : items) {
-			AddItem(itemStack, sender);
+			AddItem(itemStack);
 		}
 	}
 
 	public void SaveInbox() {
 		saveItems();
-		saveChest();
+		saveChests();
 	}
 }

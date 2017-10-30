@@ -16,14 +16,12 @@ public class CustomMailboxConfig{
 	private File dataFolder;
 	private FileConfiguration mailboxes;
 	private List<CustomMailbox> customMailboxes = new ArrayList<CustomMailbox>();
-	public List<String> disabledPlayers = new ArrayList<String>();
-	public List<String> messagePlayers = new ArrayList<String>();
 	
 	private PaperMail plugin;
 	
 	public CustomMailboxConfig(PaperMail plugin){		
 		this.plugin = plugin;
-		dataFolder = new File(this.plugin.getDataFolder().toString());
+		dataFolder = new File(this.plugin.getDataFolder().toString() + "/recipes");
 	}
 		
 	public void initMailBoxConfig(){
@@ -41,7 +39,7 @@ public class CustomMailboxConfig{
 	        mailboxFile = new File(dataFolder, "mailBoxConfig.yml");
 	    }
 	    if (!mailboxFile.exists()) {           
-	        plugin.saveResource("mailBoxConfig.yml", false);
+	        plugin.saveResource("recipes/mailBoxConfig.yml", false);
 	    }    
     }
 	  

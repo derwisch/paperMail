@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.derwisch.paperMail.configs.Settings;
+import com.github.derwisch.paperMail.recipes.WritingPaper;
 import com.github.derwisch.paperMail.utils.UUIDUtils;
 
 public class PaperMailGUI {
@@ -36,7 +37,6 @@ public class PaperMailGUI {
 	private ItemStack sendButtonEnabled;
 	private ItemStack cancelButton; 
 	private ItemStack enderChestButton;
-	private boolean paperSent;
 	
 	public SendingGUIClickResult Result = SendingGUIClickResult.CANCEL;
 	
@@ -50,15 +50,6 @@ public class PaperMailGUI {
 	}
 	
 	public PaperMailGUI(Player player) {
-		this.paperSent = false;
-		Player = player;
-		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
-		initializeButtons();
-    	itemMailGUIs.add(this);
-	}
-
-	public PaperMailGUI(Player player, boolean paperSent) {
-		this.paperSent = paperSent;
 		Player = player;
 		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
 		initializeButtons();
@@ -66,7 +57,7 @@ public class PaperMailGUI {
 	}
 	
 	private void initializeButtons() {
-		recipientMessage = new ItemStack(Material.PAPER);
+		recipientMessage = new ItemStack(Material.BOOK_AND_QUILL);
 		sendButtonEnabled = new ItemStack(Material.WOOL);
 		cancelButton = new ItemStack(Material.WOOL);
 		enderChestButton = new ItemStack(Material.ENDER_CHEST);
@@ -83,9 +74,13 @@ public class PaperMailGUI {
     	ArrayList<String> sendButtonDisabledLore = new ArrayList<String>();
     	ArrayList<String> enderChestButtonLore = new ArrayList<String>();
 
-    	recipientMessageLore.add(ChatColor.GRAY + "Add a written book named" + ChatColor.RESET);
-    	recipientMessageLore.add(ChatColor.GRAY + "like a player to define" + ChatColor.RESET);
-    	recipientMessageLore.add(ChatColor.GRAY + "the recipient." + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "Craft some writing paper," + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "then use it like a book" + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "but put your message as " + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "the content and title the" + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "book with the name of the" + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "recipient, then place the" + ChatColor.RESET);
+    	recipientMessageLore.add(ChatColor.GRAY + "created letter here" + ChatColor.RESET);
 
     	sendButtonDisabledLore.add(ChatColor.GRAY + "State a recipient before" + ChatColor.RESET);
     	sendButtonDisabledLore.add(ChatColor.GRAY + "sending" + ChatColor.RESET);
@@ -143,10 +138,9 @@ public class PaperMailGUI {
 			if (itemStack == null)
 				continue;
 			
-			ItemMeta itemMeta = itemStack.getItemMeta();
-			if (itemStack.getType() == Material.WRITTEN_BOOK && playerName == "") {
-				BookMeta bookMeta = (BookMeta)itemMeta;
-				playerName = bookMeta.getTitle();
+			if (itemStack.getType() == Material.PAPER && WritingPaper.hasSecretCode(itemStack) && playerName == "") {
+				ItemMeta itemMeta = itemStack.getItemMeta();
+				playerName = WritingPaper.stripSecretCode(itemMeta.getDisplayName());
 			}
 		}
 		if(playerName!=""){
@@ -165,21 +159,21 @@ public class PaperMailGUI {
 			
 			if (itemStack == null)
 				continue;
-			
-			ItemMeta itemMeta = itemStack.getItemMeta();
-			if (itemMeta.getDisplayName() != SEND_BUTTON_ON_TITLE && 
-				itemMeta.getDisplayName() != CANCEL_BUTTON_TITLE && 
-				itemMeta.getDisplayName() != ENDERCHEST_BUTTON_TITLE) {
-				sendingContents.add(itemStack);
+			if(itemStack.hasItemMeta()){
+				ItemMeta itemMeta = itemStack.getItemMeta();
+				if(itemMeta.hasDisplayName()){
+					if (itemMeta.getDisplayName() == SEND_BUTTON_ON_TITLE || 
+						itemMeta.getDisplayName() == CANCEL_BUTTON_TITLE || 
+						itemMeta.getDisplayName() == ENDERCHEST_BUTTON_TITLE) 
+					{
+						continue;
+					}
+				}
 			}
+			sendingContents.add(itemStack);
 		}
 		Inbox inbox = Inbox.GetInbox(recipientUUID);
-		inbox.AddItems(sendingContents, Player);
-		if (paperSent) {
-			ItemStack itemInHand = Player.getInventory().getItemInMainHand();
-			itemInHand.setAmount(itemInHand.getAmount() - 1);
-			Player.getInventory().setItemInMainHand(itemInHand);
-		}				
+		inbox.AddItems(sendingContents);			
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);		
 	}
 	

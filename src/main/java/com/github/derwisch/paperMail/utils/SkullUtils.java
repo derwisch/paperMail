@@ -9,7 +9,6 @@ import net.minecraft.server.v1_12_R1.TileEntitySkull;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.Block;
@@ -29,7 +28,6 @@ import java.util.UUID;
 public class SkullUtils {
 
     private static final Base64 base64 = new Base64();
-    public final static String secretCode = ChatColor.translateAlternateColorCodes('&', "&6&6&6");
 
     /**
      * Return a skull that has a custom texture specified by url.
@@ -86,18 +84,6 @@ public class SkullUtils {
         GameProfile newSkinProfile = new GameProfile(UUID.randomUUID(), null);
         newSkinProfile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString("{textures:{SKIN:{url:\"" + skinURL + "\"}}}")));
         return newSkinProfile;
-    }
-    
-    public static boolean hasSecretCode(ItemStack stack){
-    	if(stack!=null){
-    		ItemMeta meta = stack.getItemMeta();
-    		if(meta!=null){
-    			if(meta.getDisplayName().contains(secretCode)){
-    				return true;
-    			}
-    		}
-    	}
-    	return false;
     }
 }
  

@@ -1,0 +1,9 @@
+WritingPaper:
+  recipe:
+    - PAPER
+    - INK_SACK
+    - FEATHER
+  permission: 'papermail.craft.writingpaper'
+  displayname: '&8Writing Paper'
+  lore:
+  - '&7&oUsed to write a letter'

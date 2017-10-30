@@ -14,7 +14,7 @@ CobbleStoneMailbox:
     item7: COBBLESTONE
     item8: COBBLESTONE
     item9: COBBLESTONE
-  permission:
+  permission: 'papermail.mailbox.cobblestone'
   displayname: '&7Cobblestone &fLetterbox'
   lore:
   - '&3this is some lore about this mailbox'
