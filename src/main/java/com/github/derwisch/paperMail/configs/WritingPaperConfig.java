@@ -61,11 +61,14 @@ public class WritingPaperConfig{
 			if(recipe==null){
 				recipe = new ArrayList<Material>();
 			}
+			if(recipe.size() > 9){
+				recipe = recipe.subList(0, 8);
+			}
 			if(recipe.isEmpty()){
 				recipe.add(Material.FEATHER);
 				recipe.add(Material.INK_SACK);
 				recipe.add(Material.PAPER);
-			}
+			}		
 		}		
 	}
 }

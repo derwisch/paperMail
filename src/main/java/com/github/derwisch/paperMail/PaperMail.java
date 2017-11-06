@@ -1,20 +1,25 @@
 package com.github.derwisch.paperMail;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.derwisch.paperMail.configs.CustomMailboxConfig;
 import com.github.derwisch.paperMail.configs.Settings;
 import com.github.derwisch.paperMail.configs.WritingPaperConfig;
+import com.github.derwisch.paperMail.listeners.MailBoxListener;
 import com.github.derwisch.paperMail.listeners.PaperMailListener;
 import com.github.derwisch.paperMail.recipes.CustomMailboxes;
 import com.github.derwisch.paperMail.recipes.WritingPaper;
+
+import me.drkmatr1984.customevents.CustomEvents;
 
 public class PaperMail extends JavaPlugin {
 	  
@@ -25,6 +30,7 @@ public class PaperMail extends JavaPlugin {
 	public static Logger logger;
 	
 	private PaperMailListener listener;
+	private MailBoxListener mailBoxListener;
 	private FileConfiguration configuration;
 	private CustomMailboxConfig mailboxConfig;
 	private WritingPaperConfig writingpaperConfig;
@@ -42,9 +48,12 @@ public class PaperMail extends JavaPlugin {
     	
     	PaperMailCommandExecutor commandExecutor = new PaperMailCommandExecutor(this); 
     	getCommand("papermail").setExecutor(commandExecutor);
-    	
-    	listener = new PaperMailListener();
+    	CustomEvents customEvents = new CustomEvents(this, true);
+    	customEvents.initializeLib();
+    	this.listener = new PaperMailListener();
         this.getServer().getPluginManager().registerEvents(listener, this);
+        mailBoxListener = new MailBoxListener();
+        this.getServer().getPluginManager().registerEvents(mailBoxListener, this);
         
         initializeRecipes();
         initializeInboxes();
@@ -71,23 +80,20 @@ public class PaperMail extends JavaPlugin {
     }
 
     private void initializeInboxes() {
-		for (Player player : getServer().getOnlinePlayers()) {
-			if (player == null) {
-				continue;
-			}
-			Inbox.AddInbox(player.getUniqueId());
-		}
-		for (OfflinePlayer offPlayer : getServer().getOfflinePlayers()) {
-			if(offPlayer.hasPlayedBefore()){
-				Player player = offPlayer.getPlayer();
-				
-				if (player == null) {
-					continue;
-				}
-				Inbox.AddInbox(player.getUniqueId());
-			}			
-		}
-	}
+    	List<String> players = new ArrayList<String>();
+    	File dataFolder = new File(this.getDataFolder().toString()+"/players");
+    	if(dataFolder.listFiles()!=null){
+    		File[] files = dataFolder.listFiles();
+        	for(File file : files){
+            	players.add(file.getName().toString().replaceAll(".yml", ""));
+            }    	
+            for(String s : players){
+            	if(!s.isEmpty() && s!=null){
+            		Inbox.Inboxes.add(new Inbox(UUID.fromString(s)));
+            	}
+            }
+        }
+    }
     
     public FileConfiguration getConfiguration(){
     	return this.configuration;

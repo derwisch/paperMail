@@ -7,18 +7,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -29,14 +23,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.derwisch.paperMail.Inbox;
 import com.github.derwisch.paperMail.PaperMail;
 import com.github.derwisch.paperMail.PaperMailGUI;
-import com.github.derwisch.paperMail.Permissions;
 import com.github.derwisch.paperMail.SendingGUIClickResult;
 import com.github.derwisch.paperMail.configs.Settings;
-import com.github.derwisch.paperMail.recipes.CustomMailboxes;
 import com.github.derwisch.paperMail.recipes.WritingPaper;
-import com.github.derwisch.paperMail.utils.BlockUtils;
-import com.github.derwisch.paperMail.utils.UUIDUtils;
-import com.github.derwisch.paperMail.utils.Utils;
  
 public class PaperMailListener implements Listener {
 	
@@ -48,101 +37,7 @@ public class PaperMailListener implements Listener {
 		}
     }
     
-    @EventHandler
-    public void onPlayerPlaceMailbox(BlockPlaceEvent event){
-    	if(Settings.EnableCustomMailboxes){
-    		if(event.getPlayer().hasPermission(Permissions.CREATE_CHEST_SELF_PERM)){
-    			ItemStack mailbox = event.getItemInHand();
-	    		if(mailbox!=null){
-	    			if(CustomMailboxes.hasSecretCode(mailbox)){    				
-	    				Inbox inbox = Inbox.GetInbox(event.getPlayer().getUniqueId());
-		    			if(inbox!=null){
-		    				inbox.addChest(event.getBlock());
-		    				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
-		    			}
-	            	}
-	    		}
-    		}else{
-				event.getPlayer().sendMessage("No Permission to create Mailbox(custom)");	
-			}
-    	}  	
-    }
-    
-	@EventHandler
-    public void playerCreateMailbox(SignChangeEvent event){
-		if(event.getBlock().getState() instanceof Sign){
-	    	Sign sign = (Sign) event.getBlock().getState();
-	    	if((BlockUtils.getAttachedBlock(event.getBlock())).getType().equals(Material.CHEST)){
-	    		if(event.getLine(0).toLowerCase().contains("[mailbox]")){
-	    			Player player = event.getPlayer();
-	    			if(player.hasPermission(Permissions.CREATE_CHEST_SELF_PERM)  || player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)){
-	    				Inbox inbox = null;
-		   				if(sign.getLine(2).equals("") || sign.getLine(2).isEmpty() || sign.getLine(2)==null){
-		   					sign.setLine(2, event.getPlayer().getName());
-		   					inbox = Inbox.GetInbox(player.getUniqueId());	    					
-		   				}else if(player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)){
-		   					if(UUIDUtils.getUUIDfromPlayerName(sign.getLine(2)) != null){
-		   						inbox = Inbox.GetInbox(UUIDUtils.getUUIDfromPlayerName(sign.getLine(2)));
-		   					}else{
-		   						event.getBlock().breakNaturally();
-		   						player.sendMessage(ChatColor.DARK_RED + "Can't create Mailbox for that Player" + ChatColor.RESET);
-		   						return;
-		   					}		    					
-		   				}    				
-		   				sign.update();
-		   				if(inbox!=null){
-		   					inbox.addChest(BlockUtils.getAttachedBlock(event.getBlock()));
-							player.sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
-		   				}
-	    			}else{
-	    				player.sendMessage("No Permission to create Mailbox");	
-	    			}
-	    		}
-	    	} 		
-	    }
-	}   	
-    
-    
-    @EventHandler(priority=EventPriority.HIGH)
-    public void onInboxClick(PlayerInteractEvent event) {
-    	Player player = event.getPlayer();
-        Block clickedBlock = event.getClickedBlock();      
-        if(clickedBlock != null && Settings.InboxPlayers.contains(player.getUniqueId())) {
-        	if(!Inbox.Inboxes.isEmpty() && Inbox.Inboxes!=null){
-        		for(Inbox inbox : Inbox.Inboxes){
-                	if(inbox.playerUUID == player.getUniqueId()){
-                		if(!inbox.inboxChests.isEmpty() && inbox.inboxChests!=null){
-                			for(Block b : inbox.inboxChests){
-                    			if(Utils.areLocationsEqual(clickedBlock.getLocation(), b.getLocation())){
-                    				if(event.getHand().equals(EquipmentSlot.OFF_HAND)){
-                        				inbox.openInbox();
-                                    	event.setCancelled(true);
-                    				}else if(event.getHand().equals(EquipmentSlot.HAND)){
-                    					new PaperMailGUI(player).Show();
-                    					event.setCancelled(true);
-                    				}                 				
-                    			}
-                    		}
-                		}           		          		
-                	}else{
-                		if(!inbox.inboxChests.isEmpty() && inbox.inboxChests!=null){
-                			for(Block b : inbox.inboxChests){
-                    			if(Utils.areLocationsEqual(clickedBlock.getLocation(), b.getLocation())){
-                    				if(event.getHand().equals(EquipmentSlot.OFF_HAND)){
-                    					new PaperMailGUI(player).Show();
-                    					event.setCancelled(true);
-                    				}else if(event.getHand().equals(EquipmentSlot.HAND)){
-                    					new PaperMailGUI(player).Show();
-                    					event.setCancelled(true);
-                    				}                 				
-                    			}
-                    		}
-                		}
-                	}
-                }
-        	}        
-        }
-    }
+    //U CAN SOMETIMES REMOVE BUTTONS(I NOTICED PAPER!)
     
     @EventHandler
     public void onInventoryClick_MailGUI_Send(InventoryClickEvent event) {
@@ -171,6 +66,8 @@ public class PaperMailListener implements Listener {
     	    		event.setCancelled(true);
         		}
         	}
+    	}else{
+    		event.setCancelled(true);
     	}
     	
     }
@@ -190,6 +87,8 @@ public class PaperMailListener implements Listener {
 	    		itemMailGUI.close();
 	    		event.setCancelled(true);
 	    	}
+    	}else{
+    		event.setCancelled(true);
     	}
     }
     
@@ -208,6 +107,8 @@ public class PaperMailListener implements Listener {
 	    		event.setCancelled(true);
 	    		OpenInventory(player, player.getEnderChest());
 	    	}
+    	}else{
+    		event.setCancelled(true);
     	}
     }
 
@@ -249,6 +150,8 @@ public class PaperMailListener implements Listener {
 	        		event.setCancelled(true);
 	        	}
 	    	}
+    	}else{
+    		event.setCancelled(true);
     	}
     }
 
@@ -352,5 +255,4 @@ public class PaperMailListener implements Listener {
         	}
     	}	
     }
-    
 }

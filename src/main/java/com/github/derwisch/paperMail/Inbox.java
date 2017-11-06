@@ -1,17 +1,18 @@
 package com.github.derwisch.paperMail;
 
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Skull;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,10 +20,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.derwisch.paperMail.configs.ConfigAccessor;
 import com.github.derwisch.paperMail.configs.Settings;
+import com.github.derwisch.paperMail.utils.Utils;
 
 public class Inbox {
 	
-	public static List<Inbox> Inboxes = new ArrayList<Inbox>();
+	public static Set<Inbox> Inboxes = new HashSet<Inbox>();
+	
+	public static HashMap<UUID, Set<Block>> mailBoxes = new HashMap<UUID, Set<Block>>();
 	
 	public static void SaveAll() {
 		for (Inbox inbox : Inboxes) {
@@ -35,17 +39,27 @@ public class Inbox {
 			if (inbox.playerUUID.equals(uuid)) {
 				return inbox;
 			}
-		}
-		AddInbox(uuid);
-		return GetInbox(uuid);
+		}		
+		return AddInbox(uuid);
 	}
 	
-	public static void AddInbox(UUID uuid) {
+	public static Inbox GetInbox(OfflinePlayer player) {
+		for (Inbox inbox : Inboxes) {
+			if (inbox.playerUUID.equals(player.getUniqueId())) {
+				return inbox;
+			}
+		}
+		AddInbox(player.getUniqueId());
+		return GetInbox(player.getUniqueId());
+	}
+	
+	public static Inbox AddInbox(UUID uuid) {
 		if (!Settings.InboxPlayers.contains(uuid)) {
 			Settings.InboxPlayers.add(uuid);
 		}
 		Inbox inbox = new Inbox(uuid);
 		Inboxes.add(inbox);
+		return inbox;
 	}
 	
 	public static void RemoveInbox(String playerUUID) {
@@ -56,9 +70,49 @@ public class Inbox {
 		}
 	}
 	
+	public static Inbox getInboxfromLocation(Location loc){
+		if(hasInboxAtLocation(loc)){
+			for(UUID id : mailBoxes.keySet()){
+				Set<Block> mailBox = mailBoxes.get(id);
+				for(Block b : mailBox){
+					if(Utils.areLocationsEqual(loc, b.getLocation())){
+						return GetInbox(id);
+					}
+				}
+			}
+		}	
+		return null;
+	}
+	
+	public static boolean hasInboxAtLocation(Location loc){
+		for(Set<Block> mailBox : mailBoxes.values()){
+			for(Block b : mailBox){
+				if(Utils.areLocationsEqual(loc, b.getLocation())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean hasInboxChestAtLocation(Player player, Location loc){
+		if(hasInboxAtLocation(loc)){
+			if(mailBoxes.containsKey(player.getUniqueId())){
+				for(Block b : mailBoxes.get(player.getUniqueId())){
+					if(Utils.areLocationsEqual(loc, b.getLocation())){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	
 	public UUID playerUUID;
 	public Inventory inventory;
-	public Collection<Block> inboxChests;
+	public Set<Block> inboxChests;
 	
 	private FileConfiguration playerConfig;
 	private ConfigAccessor configAccessor;
@@ -68,10 +122,11 @@ public class Inbox {
 		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + uuid + ".yml");
 		this.playerConfig = configAccessor.getConfig();
 		configAccessor.saveConfig();
-		this.inboxChests = new ArrayList<Block>();
+		this.inboxChests = new HashSet<Block>();
 		initMailBox();
 		loadChest();
 		loadItems();
+		Inbox.Inboxes.add(this);
 	}
 	
 	private void initMailBox() {
@@ -79,22 +134,42 @@ public class Inbox {
 		this.inventory = Bukkit.createInventory(player, 36, PaperMail.INBOX_GUI_TITLE);
 	}
 	
+	//change to for loop for ints
 	private void loadChest() {
-		for(String s : playerConfig.getKeys(false)){
-			if(s.contains("chest")){
-				String worldName = playerConfig.getString(s + ".world");
-				worldName = (worldName != null) ? worldName : "";
-				World world = Bukkit.getWorld(worldName);
-				int x = playerConfig.getInt(s + ".x");
-				int y = playerConfig.getInt(s + ".y");
-				int z = playerConfig.getInt(s + ".z");
-
-				Block block = (world != null) ? world.getBlockAt(x, y, z) : null;
-				if(block != null && (block.getType() == Material.CHEST || block.getState() instanceof Skull))
-				inboxChests.add(block);
-			}			
+		ConfigurationSection chests = playerConfig.getConfigurationSection("chest");
+		if(chests!=null){
+			for(int i = 0; i < chests.getKeys(false).size(); i++){
+				ConfigurationSection section = playerConfig.getConfigurationSection("chest" + "." + i);
+				if(section!=null){
+					String worldName = playerConfig.getString(section.getCurrentPath() + ".world");
+					Bukkit.getLogger().info("[PaperMail] WorldSection: " + section.getCurrentPath().toString() + ".world");
+					Bukkit.getLogger().info("[PaperMail] World: " + worldName);
+					if(worldName!=null && worldName != ""){
+						World world = Bukkit.getWorld(worldName);
+						if(world!=null){
+							int x = playerConfig.getInt(section.getCurrentPath() + ".x");
+							int y = playerConfig.getInt(section.getCurrentPath() + ".y");
+							int z = playerConfig.getInt(section.getCurrentPath() + ".z");
+				            if(world.getBlockAt(x, y, z)!=null){
+				            	Block block = world.getBlockAt(x, y, z);
+				    			if(block != null){
+				    				Bukkit.getLogger().info("[PaperMail]Checking for Right type --> " + block.getType().toString());
+				    				if(block.getType() == Material.CHEST || block.getType() == Material.SKULL){
+				   						inboxChests.add(block);
+			    						Bukkit.getLogger().info("[PaperMail]Loading " + block.getType().toString() + " for " + playerUUID);
+			    					}
+			    				}
+				    		}
+						}				
+					}
+				}							 		
+			}
+		}else{
+			Bukkit.getLogger().info("[PaperMail]: section = null");
 		}
-		
+		if(inboxChests!=null){
+			mailBoxes.put(playerUUID, inboxChests);
+		}
 	}
 	
 	private void loadItems() {
@@ -114,16 +189,18 @@ public class Inbox {
 			return;
 		}
 		int i = 0;
-		for(Block b : inboxChests){
-			i++;
+		for(Block b : inboxChests){		
 			String worldName = b.getLocation().getWorld().getName();
 			int x = b.getLocation().getBlockX();
 			int y = b.getLocation().getBlockY();
 			int z = b.getLocation().getBlockZ();
-			playerConfig.set("chest" + i + ".world", worldName);
-			playerConfig.set("chest" + i + ".x", x);
-			playerConfig.set("chest" + i + ".y", y);
-			playerConfig.set("chest" + i + ".z", z);
+			String type = b.getType().toString();
+			playerConfig.set("chest." + i + ".type", type);
+			playerConfig.set("chest." + i + ".world", worldName);
+			playerConfig.set("chest." + i + ".x", x);
+			playerConfig.set("chest." + i + ".y", y);
+			playerConfig.set("chest." + i + ".z", z);
+			i++;
 		}
 		configAccessor.saveConfig();
 	}
@@ -154,28 +231,19 @@ public class Inbox {
 		Player player = Bukkit.getServer().getPlayer(playerUUID);
 		for(Block inboxChest : inboxChests){
 			if(inboxChest!=null){
-				if (inboxChest.getState() instanceof Chest) {
-					if (((Chest)inboxChest).getInventory().addItem(itemStack).keySet().toArray().length > 0) {
-						if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
-							player.getInventory().addItem(itemStack);
-							return;
-						}
-					}
-				} else{
-					if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
-						player.getInventory().addItem(itemStack);
-						return;
-					}
+				if (inventory.addItem(itemStack).keySet().toArray().length > 0) {
+					player.getInventory().addItem(itemStack);
+					return;
 				}
 			}		
 		}		
-		saveItems();
 	}
 	
 	public void AddItems(Collection<ItemStack> items) {
 		for (ItemStack itemStack : items) {
 			AddItem(itemStack);
 		}
+		saveItems();
 	}
 
 	public void SaveInbox() {

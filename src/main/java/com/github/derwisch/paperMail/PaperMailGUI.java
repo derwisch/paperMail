@@ -12,7 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.derwisch.paperMail.configs.Settings;
@@ -50,6 +49,13 @@ public class PaperMailGUI {
 	}
 	
 	public PaperMailGUI(Player player) {
+		Player = player;
+		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
+		initializeButtons();
+    	itemMailGUIs.add(this);
+	}
+	
+	public PaperMailGUI(Player player, boolean chest) {
 		Player = player;
 		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
 		initializeButtons();
@@ -172,6 +178,10 @@ public class PaperMailGUI {
 			}
 			sendingContents.add(itemStack);
 		}
+		for(ItemStack st : sendingContents){
+			Player.sendMessage("SendContents: adding --> " + st.toString());
+		}
+		
 		Inbox inbox = Inbox.GetInbox(recipientUUID);
 		inbox.AddItems(sendingContents);			
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);		

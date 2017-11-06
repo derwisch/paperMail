@@ -13,6 +13,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.derwisch.paperMail.PaperMail;
 import com.github.derwisch.paperMail.configs.WritingPaperConfig;
 
+import fr.galaxyoyo.spigot.nbtapi.ItemStackUtils;
+import fr.galaxyoyo.spigot.nbtapi.TagCompound;
+import fr.galaxyoyo.spigot.nbtapi.TagList;
+
 public class WritingPaper{
 	
 	private PaperMail plugin;
@@ -33,12 +37,31 @@ public class WritingPaper{
 		writingPaperMeta.setDisplayName((ChatColor.translateAlternateColorCodes('&', WritingPaperConfig.displayName)) + secretCode);
 		writingPaperMeta.setLore(writingPaperLore);
     	writingPaper.setItemMeta(writingPaperMeta);
-    	writingPaper.setDurability((short)0);   	
-		ShapelessRecipe writingPaperRecipe = new ShapelessRecipe(key, writingPaper);
-		for(Material m : WritingPaperConfig.recipe){
-			writingPaperRecipe.addIngredient(m);
-		}
-		this.plugin.getServer().addRecipe(writingPaperRecipe);
+    	writingPaper.setDurability((short)0);
+    	TagCompound compound = ItemStackUtils.getTagCompound(writingPaper, false);
+    	if(compound != null){
+    		if(compound.containsKey("pages")){
+        		TagList pages = compound.getList("pages");
+        		if(pages!=null){
+        			if(pages.isEmpty()){
+            			pages.add("");
+                		compound.setList("pages", pages);
+                		ItemStackUtils.setTagCompound(writingPaper, compound);
+            		}
+        		}      		
+        	}else{
+        		TagList pages = new TagList();
+        		pages.add("");
+        		compound.setList("pages", pages);
+        		ItemStackUtils.setTagCompound(writingPaper, compound);
+        	}
+    		ShapelessRecipe writingPaperRecipe = new ShapelessRecipe(key, writingPaper);
+    		for(Material m : WritingPaperConfig.recipe){
+    			writingPaperRecipe.addIngredient(m);
+    		}
+    		this.plugin.getServer().addRecipe(writingPaperRecipe);
+    		this.plugin.getLogger().info("WritingPaperREGISTERED");
+    	}		
 	}
 	
 	public static boolean hasSecretCode(ItemStack stack){
@@ -61,5 +84,9 @@ public class WritingPaper{
 			result = code.replace(secretCode, "");
 		}
 		return result;
+	}
+	
+	public void unRegisterWritingPaper(){
+		
 	}
 }

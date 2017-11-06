@@ -1,13 +1,12 @@
 package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -81,8 +80,10 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					}
 					letterLore.add(ChatColor.translateAlternateColorCodes('&', (Settings.LetterSignature + player.getName())));
 	        		letterMeta.setLore(letterLore);
-	        		letterpaper.setItemMeta(letterMeta);				
-					Inbox.GetInbox(uid).AddItem(letterpaper);
+	        		letterpaper.setItemMeta(letterMeta);
+	        		Collection<ItemStack> stack = new ArrayList<ItemStack>();
+	        		stack.add(letterpaper);
+					Inbox.GetInbox(uid).AddItems(stack);
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					return true;
 				}
