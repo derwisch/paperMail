@@ -24,7 +24,7 @@ import me.drkmatr1984.customevents.CustomEvents;
 public class PaperMail extends JavaPlugin {
 	  
 	public static final String NEW_MAIL_GUI_TITLE = ChatColor.BLACK + "PaperMail: New Mail" + ChatColor.RESET;
-	public static final String INBOX_GUI_TITLE = ChatColor.BLACK + "PaperMail: Inbox" + ChatColor.RESET;
+	public static final String INBOX_GUI_TITLE = ChatColor.BLACK + "InboxesAccessor" + ChatColor.RESET;
 	public static PaperMail instance;
 	public static Server server;
 	public static Logger logger;
@@ -63,7 +63,7 @@ public class PaperMail extends JavaPlugin {
     
 	@Override
     public void onDisable() {
-		Inbox.SaveAll();
+		InboxesAccessor.SaveAll();
 		Settings.SaveConfiguration(configuration);
 		this.saveConfig();
     	getLogger().info("Disabled PaperMail");
@@ -89,7 +89,7 @@ public class PaperMail extends JavaPlugin {
             }    	
             for(String s : players){
             	if(!s.isEmpty() && s!=null){
-            		Inbox.Inboxes.add(new Inbox(UUID.fromString(s)));
+            		InboxesAccessor.Inboxes.add(new InboxesAccessor(UUID.fromString(s)));
             	}
             }
         }

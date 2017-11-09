@@ -182,7 +182,7 @@ public class PaperMailGUI {
 			Player.sendMessage("SendContents: adding --> " + st.toString());
 		}
 		
-		Inbox inbox = Inbox.GetInbox(recipientUUID);
+		InboxesAccessor inbox = InboxesAccessor.GetInbox(recipientUUID);
 		inbox.AddItems(sendingContents);			
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);		
 	}

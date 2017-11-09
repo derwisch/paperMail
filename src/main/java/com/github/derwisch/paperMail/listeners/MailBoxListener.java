@@ -10,7 +10,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
-import com.github.derwisch.paperMail.Inbox;
+import com.github.derwisch.paperMail.InboxesAccessor;
 import com.github.derwisch.paperMail.PaperMailGUI;
 import com.github.derwisch.paperMail.Permissions;
 import com.github.derwisch.paperMail.configs.Settings;
@@ -30,15 +30,15 @@ public class MailBoxListener implements Listener {
     			ItemStack mailbox = event.getItemInHand();
 	    		if(mailbox!=null){
 	    			if(CustomMailboxes.hasSecretCode(mailbox)){    				
-	    				Inbox inbox = Inbox.GetInbox(event.getPlayer().getUniqueId());
+	    				InboxesAccessor inbox = InboxesAccessor.GetInbox(event.getPlayer().getUniqueId());
 		    			if(inbox!=null){
 		    				inbox.addChest(event.getBlock());
-		    				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
+		    				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "InboxesAccessor created!" + ChatColor.RESET);
 		    			}
 	            	}
 	    		}
     		}else{
-				event.getPlayer().sendMessage("No Permission to create Mailbox(custom)");	
+				event.getPlayer().sendMessage("No Permission to create MailboxObject(custom)");	
 			}
     	}  	
     }
@@ -50,33 +50,33 @@ public class MailBoxListener implements Listener {
 	    		if(event.getLine(0).toLowerCase().contains("[mailbox]")){
 	    			Player player = event.getPlayer();
 	    			if(player.hasPermission(Permissions.CREATE_CHEST_SELF_PERM)  || player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)){
-	    				Inbox inbox = null;
+	    				InboxesAccessor inbox = null;
 		   				if(event.getLine(2).equals("") || event.getLine(2).isEmpty() || event.getLine(2)==null){
 		   					event.setLine(2, event.getPlayer().getName());
-		   					inbox = Inbox.GetInbox(player.getUniqueId());	    					
+		   					inbox = InboxesAccessor.GetInbox(player.getUniqueId());	    					
 		   				}else{
 		   					if(player.hasPermission(Permissions.CREATE_CHEST_ALL_PERM)){
 			   					if(UUIDUtils.getUUIDfromPlayerName(event.getLine(2)) != null){
-			   						inbox = Inbox.GetInbox(UUIDUtils.getUUIDfromPlayerName(event.getLine(2)));
+			   						inbox = InboxesAccessor.GetInbox(UUIDUtils.getUUIDfromPlayerName(event.getLine(2)));
 			   					}else{
 			   						event.getBlock().breakNaturally();
-			   						player.sendMessage(ChatColor.DARK_RED + "Can't create Mailbox for that Player" + ChatColor.RESET);
+			   						player.sendMessage(ChatColor.DARK_RED + "Can't create MailboxObject for that Player" + ChatColor.RESET);
 			   						event.setCancelled(true);
 			   						return;
 			   					}
 		   					}else{
 		   						event.getBlock().breakNaturally();
-			   					player.sendMessage("No Permission to create Mailbox");
+			   					player.sendMessage("No Permission to create MailboxObject");
 			   					event.setCancelled(true);
 			   					return;
 		   					}
 		   				}	    				
 		   				if(inbox!=null){
 		   					inbox.addChest(BlockUtils.getAttachedBlock(event.getBlock()));
-							player.sendMessage(ChatColor.DARK_GREEN + "Inbox created!" + ChatColor.RESET);
+							player.sendMessage(ChatColor.DARK_GREEN + "InboxesAccessor created!" + ChatColor.RESET);
 		   				}
 	    			}else{
-	    				player.sendMessage("No Permission to create Mailbox");	
+	    				player.sendMessage("No Permission to create MailboxObject");	
 	    			}
 	    		}
 	    	} 		
@@ -89,8 +89,8 @@ public class MailBoxListener implements Listener {
     	Player player = event.getPlayer();
         Block clickedBlock = event.getClickedBlock();
         if(clickedBlock != null) {
-        	if(!Inbox.Inboxes.isEmpty() && Inbox.Inboxes!=null){
-        		if(Inbox.hasInboxAtLocation(clickedBlock.getLocation())){ //Check if there are any inbox chests at all here
+        	if(!InboxesAccessor.Inboxes.isEmpty() && InboxesAccessor.Inboxes!=null){
+        		if(InboxesAccessor.hasInboxAtLocation(clickedBlock.getLocation())){ //Check if there are any inbox chests at all here
         			new PaperMailGUI(player).Show();
         			event.setCancelled(true);
         		}
@@ -103,11 +103,11 @@ public class MailBoxListener implements Listener {
     	Player player = event.getPlayer();
         Block clickedBlock = event.getClickedBlock();
         if(clickedBlock != null) {
-        	if(!Inbox.Inboxes.isEmpty() && Inbox.Inboxes!=null){
-        		if(Inbox.hasInboxAtLocation(clickedBlock.getLocation())){ //Check if there are any inbox chests at all here
-        			if(Inbox.hasInboxChestAtLocation(player, clickedBlock.getLocation())){ // Check if player has an inbox chest here
+        	if(!InboxesAccessor.Inboxes.isEmpty() && InboxesAccessor.Inboxes!=null){
+        		if(InboxesAccessor.hasInboxAtLocation(clickedBlock.getLocation())){ //Check if there are any inbox chests at all here
+        			if(InboxesAccessor.hasInboxChestAtLocation(player, clickedBlock.getLocation())){ // Check if player has an inbox chest here
         				event.setCancelled(true);
-        				Inbox.GetInbox(player).openInbox();
+        				InboxesAccessor.GetInbox(player).openInbox();
         			}else{
         				player.sendMessage("Not your inbox");
         				event.setCancelled(true);
@@ -122,9 +122,9 @@ public class MailBoxListener implements Listener {
     	Player player = event.getPlayer();
         Block clickedBlock = event.getClickedBlock();
         if(clickedBlock != null) {
-        	if(!Inbox.Inboxes.isEmpty() && Inbox.Inboxes!=null){
-        		if(Inbox.hasInboxAtLocation(clickedBlock.getLocation())){ //Check if there are any inbox chests at all here
-        			if(Inbox.hasInboxChestAtLocation(player, clickedBlock.getLocation())){ // Check if player has an inbox chest here
+        	if(!InboxesAccessor.Inboxes.isEmpty() && InboxesAccessor.Inboxes!=null){
+        		if(InboxesAccessor.hasInboxAtLocation(clickedBlock.getLocation())){ //Check if there are any inbox chests at all here
+        			if(InboxesAccessor.hasInboxChestAtLocation(player, clickedBlock.getLocation())){ // Check if player has an inbox chest here
         				event.setCancelled(false);
         			}else{
         				event.setCancelled(true);

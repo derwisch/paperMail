@@ -83,7 +83,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	        		letterpaper.setItemMeta(letterMeta);
 	        		Collection<ItemStack> stack = new ArrayList<ItemStack>();
 	        		stack.add(letterpaper);
-					Inbox.GetInbox(uid).AddItems(stack);
+					InboxesAccessor.GetInbox(uid).AddItems(stack);
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					return true;
 				}

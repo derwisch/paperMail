@@ -29,9 +29,11 @@ public class Settings {
 	
     public static void LoadConfiguration(Configuration config) {
         try {
-        	DefaultBoxRows = Math.max(3, config.getInt("general.DefaultBoxRows"));
-        	MailWindowRows = Math.max(3, config.getInt("general.MailWindowRows"));
-        	
+        	DefaultBoxRows = Math.min(config.getInt("general.DefaultBoxRows"), 4);
+        	MailWindowRows = Math.min(config.getInt("general.MailWindowRows"), 3);
+        	if(MailWindowRows < 3){
+        		MailWindowRows = 3;
+        	}       	
         	EnableTextMail = config.getBoolean("general.EnableTextMail");
         	EnableItemMail = config.getBoolean("general.EnableItemMail");
         	EnableEnderchest = config.getBoolean("general.EnableEnderchest");

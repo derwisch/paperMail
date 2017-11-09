@@ -60,7 +60,6 @@ public class WritingPaper{
     			writingPaperRecipe.addIngredient(m);
     		}
     		this.plugin.getServer().addRecipe(writingPaperRecipe);
-    		this.plugin.getLogger().info("WritingPaperREGISTERED");
     	}		
 	}
 	

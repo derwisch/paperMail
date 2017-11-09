@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.derwisch.paperMail.Inbox;
+import com.github.derwisch.paperMail.InboxesAccessor;
 import com.github.derwisch.paperMail.PaperMail;
 import com.github.derwisch.paperMail.PaperMailGUI;
 import com.github.derwisch.paperMail.SendingGUIClickResult;
@@ -31,9 +31,9 @@ public class PaperMailListener implements Listener {
 	
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
-		Inbox inbox = Inbox.GetInbox(event.getPlayer().getUniqueId());
+		InboxesAccessor inbox = InboxesAccessor.GetInbox(event.getPlayer().getUniqueId());
 		if (inbox == null) {
-			Inbox.AddInbox(event.getPlayer().getUniqueId());
+			InboxesAccessor.AddInbox(event.getPlayer().getUniqueId());
 		}
     }
     
@@ -189,7 +189,7 @@ public class PaperMailListener implements Listener {
 
     	if (inventory.getName() == PaperMail.INBOX_GUI_TITLE) {
     		Player player = ((Player)inventory.getHolder());
-    		Inbox inbox = Inbox.GetInbox(player.getUniqueId());
+    		InboxesAccessor inbox = InboxesAccessor.GetInbox(player.getUniqueId());
     		inbox.SaveInbox();
     	}
     	

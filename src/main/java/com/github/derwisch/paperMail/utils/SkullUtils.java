@@ -4,20 +4,12 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.TileEntitySkull;
-
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
-
 import java.util.UUID;
 
 /**
@@ -69,7 +61,8 @@ public class SkullUtils {
         itemStack.setItemMeta(meta);
         return itemStack;
     }
-
+	
+	/*
     public static void setBlocktoSkull(String skinUrl, Block block) {
         block.setType(Material.SKULL);
         org.bukkit.block.Skull skullData = (org.bukkit.block.Skull) block.getState();
@@ -84,6 +77,6 @@ public class SkullUtils {
         GameProfile newSkinProfile = new GameProfile(UUID.randomUUID(), null);
         newSkinProfile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString("{textures:{SKIN:{url:\"" + skinURL + "\"}}}")));
         return newSkinProfile;
-    }
+    }*/
 }
  
