@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.derwisch.paperMail.PaperMail;
-import com.github.derwisch.paperMail.configs.Settings;
 import com.github.derwisch.paperMail.utils.SkullUtils;
 import com.github.derwisch.paperMail.utils.UUIDUtils;
 import com.github.derwisch.paperMail.utils.Utils;
@@ -57,8 +56,14 @@ public class PlayerInboxChest{
 		this.pages = createInventoryList((List<ItemStack>) stacks);
 	}
 	
+	//fix this monkey shit
 	private HashMap<Integer, Inventory> createInventoryList(List<ItemStack> stacks){
-		HashMap<Integer, Inventory> pages = this.pages;
+		HashMap<Integer, Inventory> pages;
+		if(this.pages!=null){
+			pages = this.pages;
+		}else{
+			pages = new HashMap<Integer, Inventory>();
+		}
 		String title = UUIDUtils.getPlayerNamefromUUID(uuid) + "'s " + PaperMail.INBOX_GUI_TITLE;
 		int j = 0;
 		int pageNum = 1;
@@ -67,22 +72,30 @@ public class PlayerInboxChest{
 		}		
 		do
 		{
-			Inventory tempInv = Bukkit.createInventory(null, Settings.DefaultBoxRows * 9, "Temp");
+			Inventory tempInv = Bukkit.createInventory(null, 36, "Temp");
 			if(!pages.isEmpty()){
 				tempInv = pages.get(pages.size());
 			}
-			ItemStack item;
+			ItemStack item = null;
 			do{
-				item = stacks.get(j);
-				if(stacks!=null)
+				try{
+					item = stacks.get(j);
+				}catch(IndexOutOfBoundsException e){
+					
+				}
+				if(stacks!=null && item!=null)
 					if(Utils.inventoryCheck(tempInv, item)){
 						tempInv.addItem(item);
 						j++;
-					}
-			}while(Utils.inventoryCheck(tempInv, item) && tempInv!=null);			
-			Inventory inventory = Bukkit.createInventory(null, ((Settings.DefaultBoxRows * 9) + 9), title);
-			for(ItemStack item1 : tempInv){
-				inventory.addItem(item1);
+					}				
+			}while(item!=null && Utils.inventoryCheck(tempInv, item) && tempInv!=null);			
+			Inventory inventory = Bukkit.createInventory(null, 54, title);
+			if(tempInv!=null){
+				for(ItemStack item1 : tempInv){
+					if(item1!=null){
+						inventory.addItem(item1);
+					}				
+				}
 			}
 			pages.put(pageNum,inventory);
 			pageNum++;
@@ -94,7 +107,7 @@ public class PlayerInboxChest{
 				inventory.setItem(36, getBackButton(i - 1));
 			}
 			inventory.setItem(40, getPageNumberButton(i));
-			if(i > pages.size()){
+			if(i < pages.size()){
 				inventory.setItem(45, getForwardButton(i + 1));
 			}
 			i++;
@@ -111,6 +124,7 @@ public class PlayerInboxChest{
 			lore.add(ChatColor.translateAlternateColorCodes('&', "Back to page " + (pageNum - 1)) + secretCode);
 			backMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&cBack"));
 			backMeta.setLore(lore);
+			backButton.setItemMeta(backMeta);
 		}
 		return backButton;
 	}
@@ -125,6 +139,7 @@ public class PlayerInboxChest{
 			List<String> lore = new ArrayList<String>();
 			pageMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&ePage&6 " + pageNum) + secretCode);
 			pageMeta.setLore(lore);
+			pageNumber.setItemMeta(pageMeta);
 		}
 		return pageNumber;
 	}
@@ -138,6 +153,7 @@ public class PlayerInboxChest{
 			lore.add(ChatColor.translateAlternateColorCodes('&', "Forward to page " + (pageNum - 1)) + secretCode);
 			forwardMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&aForward"));
 			forwardMeta.setLore(lore);
+			forwardButton.setItemMeta(forwardMeta);
 		}
 		return forwardButton;
 	}

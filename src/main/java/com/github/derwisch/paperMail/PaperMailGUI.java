@@ -31,6 +31,7 @@ public class PaperMailGUI {
 	public Inventory Inventory;
 	public Player Player;
 	private UUID recipientUUID;
+	private PaperMail plugin;
 	
 	private ItemStack recipientMessage; 
 	private ItemStack sendButtonEnabled;
@@ -48,14 +49,8 @@ public class PaperMailGUI {
 		return openGUIs.get(uuid);
 	}
 	
-	public PaperMailGUI(Player player) {
-		Player = player;
-		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
-		initializeButtons();
-    	itemMailGUIs.add(this);
-	}
-	
-	public PaperMailGUI(Player player, boolean chest) {
+	public PaperMailGUI(PaperMail plugin, Player player) {
+		this.plugin = plugin;
 		Player = player;
 		Inventory = Bukkit.createInventory(player, Settings.MailWindowRows * 9, PaperMail.NEW_MAIL_GUI_TITLE);
 		initializeButtons();
@@ -182,8 +177,7 @@ public class PaperMailGUI {
 			Player.sendMessage("SendContents: adding --> " + st.toString());
 		}
 		
-		InboxesAccessor inbox = InboxesAccessor.GetInbox(recipientUUID);
-		inbox.AddItems(sendingContents);			
+		plugin.getInboxesManager().getInbox(recipientUUID).addItems(sendingContents);		
 		Player.sendMessage(ChatColor.DARK_GREEN + "Message sent!" + ChatColor.RESET);		
 	}
 	

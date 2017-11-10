@@ -24,9 +24,9 @@ public class Inbox{
 	private Mailboxes mailBoxes;
 	private PlayerInboxChest chest;
 	
-	public Inbox(UUID uuid){
+	public Inbox(PaperMail plugin, UUID uuid){
 		this.uuid = uuid;
-		this.configAccessor = new ConfigAccessor(PaperMail.instance, "players\\" + uuid + ".yml");
+		this.configAccessor = new ConfigAccessor(plugin, "players\\" + uuid + ".yml");
 		this.playerConfig = configAccessor.getConfig();
 		if(this.playerConfig==null){
 			configAccessor.saveConfig();
@@ -113,6 +113,10 @@ public class Inbox{
 			}
 		}
 		return stacks;
+	}
+	
+	public UUID getUUID(){
+		return this.uuid;
 	}
 	
 }

@@ -1,9 +1,5 @@
 package com.github.derwisch.paperMail;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -24,8 +20,8 @@ import me.drkmatr1984.customevents.CustomEvents;
 public class PaperMail extends JavaPlugin {
 	  
 	public static final String NEW_MAIL_GUI_TITLE = ChatColor.BLACK + "PaperMail: New Mail" + ChatColor.RESET;
-	public static final String INBOX_GUI_TITLE = ChatColor.BLACK + "InboxesAccessor" + ChatColor.RESET;
-	public static PaperMail instance;
+	public static final String INBOX_GUI_TITLE = ChatColor.BLACK + "InboxesManager" + ChatColor.RESET;
+	private static PaperMail plugin;
 	public static Server server;
 	public static Logger logger;
 	
@@ -35,10 +31,11 @@ public class PaperMail extends JavaPlugin {
 	private CustomMailboxConfig mailboxConfig;
 	private WritingPaperConfig writingpaperConfig;
 	private CustomMailboxes customMailboxes;
+	private InboxesManager inboxesManager;
 	
     @Override
     public void onEnable() {
-       	instance = this;
+       	plugin = this;
     	server = this.getServer();
     	logger = this.getLogger();
     	
@@ -50,49 +47,35 @@ public class PaperMail extends JavaPlugin {
     	getCommand("papermail").setExecutor(commandExecutor);
     	CustomEvents customEvents = new CustomEvents(this, true);
     	customEvents.initializeLib();
-    	this.listener = new PaperMailListener();
+    	inboxesManager = new InboxesManager(plugin);
+    	this.listener = new PaperMailListener(this);
+    	initializeRecipes();
         this.getServer().getPluginManager().registerEvents(listener, this);
-        mailBoxListener = new MailBoxListener();
-        this.getServer().getPluginManager().registerEvents(mailBoxListener, this);
-        
-        initializeRecipes();
-        initializeInboxes();
-        
+        mailBoxListener = new MailBoxListener(this);
+        this.getServer().getPluginManager().registerEvents(mailBoxListener, this);           
     	logger.info("Enabled PaperMail");
     }
     
 	@Override
     public void onDisable() {
-		InboxesAccessor.SaveAll();
+		inboxesManager.saveInboxes();
 		Settings.SaveConfiguration(configuration);
 		this.saveConfig();
     	getLogger().info("Disabled PaperMail");
     }
     
     private void initializeRecipes() {		
-		mailboxConfig = new CustomMailboxConfig(instance);
+		mailboxConfig = new CustomMailboxConfig(plugin);
 		mailboxConfig.initMailBoxConfig();
-		writingpaperConfig = new WritingPaperConfig(instance);
+		writingpaperConfig = new WritingPaperConfig(plugin);
 		writingpaperConfig.initWritingPaperConfig();
-		new WritingPaper(instance).registerWritingPaper();
-		customMailboxes = new CustomMailboxes(instance, mailboxConfig.getCustomMailboxes());
+		new WritingPaper(plugin).registerWritingPaper();
+		customMailboxes = new CustomMailboxes(plugin, mailboxConfig.getCustomMailboxes());
 		customMailboxes.registerMailboxes();
     }
-
-    private void initializeInboxes() {
-    	List<String> players = new ArrayList<String>();
-    	File dataFolder = new File(this.getDataFolder().toString()+"/players");
-    	if(dataFolder.listFiles()!=null){
-    		File[] files = dataFolder.listFiles();
-        	for(File file : files){
-            	players.add(file.getName().toString().replaceAll(".yml", ""));
-            }    	
-            for(String s : players){
-            	if(!s.isEmpty() && s!=null){
-            		InboxesAccessor.Inboxes.add(new InboxesAccessor(UUID.fromString(s)));
-            	}
-            }
-        }
+    
+    public InboxesManager getInboxesManager(){
+    	return this.inboxesManager;
     }
     
     public FileConfiguration getConfiguration(){

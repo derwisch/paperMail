@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.derwisch.paperMail.InboxesAccessor;
+import com.github.derwisch.paperMail.InboxesManager;
 import com.github.derwisch.paperMail.PaperMail;
 import com.github.derwisch.paperMail.PaperMailGUI;
 import com.github.derwisch.paperMail.SendingGUIClickResult;
@@ -29,12 +29,19 @@ import com.github.derwisch.paperMail.recipes.WritingPaper;
  
 public class PaperMailListener implements Listener {
 	
+	private PaperMail plugin;
+	private InboxesManager inboxesManager;
+	
+	public PaperMailListener(PaperMail plugin){
+		this.plugin = plugin;
+		this.inboxesManager = plugin.getInboxesManager();
+	}
+	
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
-		InboxesAccessor inbox = InboxesAccessor.GetInbox(event.getPlayer().getUniqueId());
-		if (inbox == null) {
-			InboxesAccessor.AddInbox(event.getPlayer().getUniqueId());
-		}
+    	if(!inboxesManager.hasInbox(event.getPlayer().getUniqueId())){
+    		inboxesManager.addInbox(event.getPlayer().getUniqueId());
+    	}
     }
     
     //U CAN SOMETIMES REMOVE BUTTONS(I NOTICED PAPER!)
@@ -105,7 +112,7 @@ public class PaperMailListener implements Listener {
 	    		PaperMailGUI itemMailGUI = PaperMailGUI.GetGUIfromPlayer(player);
 	    		itemMailGUI.Result = SendingGUIClickResult.OPEN_ENDERCHEST;
 	    		event.setCancelled(true);
-	    		OpenInventory(player, player.getEnderChest());
+	    		OpenInventory(plugin, player, player.getEnderChest());
 	    	}
     	}else{
     		event.setCancelled(true);
@@ -113,11 +120,11 @@ public class PaperMailListener implements Listener {
     }
 
     private static Player player = null;
-    private static Inventory inventory = null;    
-    public static void OpenInventory(Player player, Inventory inventory) {
+    private static Inventory inventory = null;
+    public static void OpenInventory(PaperMail plugin, Player player, Inventory inventory) {
     	PaperMailListener.player = player;
     	PaperMailListener.inventory = inventory;
-    	PaperMail.server.getScheduler().scheduleSyncDelayedTask(PaperMail.instance, new Runnable() {
+    	PaperMail.server.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
     		public void run() {
     	    	openInventory(PaperMailListener.player, PaperMailListener.inventory);
     	    }
@@ -186,19 +193,12 @@ public class PaperMailListener implements Listener {
         		}
     		}	
     	}
-
-    	if (inventory.getName() == PaperMail.INBOX_GUI_TITLE) {
-    		Player player = ((Player)inventory.getHolder());
-    		InboxesAccessor inbox = InboxesAccessor.GetInbox(player.getUniqueId());
-    		inbox.SaveInbox();
-    	}
-    	
-    	
+    	  	
     	if (inventory.getType().toString() == "ENDER_CHEST") {
         	Player player = (Player)event.getPlayer();
         	PaperMailGUI gui = PaperMailGUI.GetOpenGUI(player.getUniqueId());
         	if (gui != null) {
-        		OpenInventory(player, gui.Inventory);
+        		OpenInventory(plugin, player, gui.Inventory);
         		gui.Result = SendingGUIClickResult.CANCEL;
         	}
     		

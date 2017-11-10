@@ -1,7 +1,6 @@
 package com.github.derwisch.paperMail;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,12 +30,12 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){		
 		if (cmd.getName().equalsIgnoreCase("papermail")){
 			if (!(sender instanceof Player) && args.length > 0) {
-				sender.sendMessage("Current Version of PaperMail is " + PaperMail.instance.getDescription().getVersion());
+				sender.sendMessage("Current Version of PaperMail is " + plugin.getDescription().getVersion());
 				return true;
 			} else {
 				Player player = (Player) sender;
 				if (args.length == 0) {
-					sender.sendMessage("Current Version of PaperMail is " + PaperMail.instance.getDescription().getVersion());
+					sender.sendMessage("Current Version of PaperMail is " + plugin.getDescription().getVersion());
 					return true;
 				}						
 				if (!args[0].toLowerCase().equals("sendtext")) {
@@ -81,9 +80,7 @@ public class PaperMailCommandExecutor implements CommandExecutor {
 					letterLore.add(ChatColor.translateAlternateColorCodes('&', (Settings.LetterSignature + player.getName())));
 	        		letterMeta.setLore(letterLore);
 	        		letterpaper.setItemMeta(letterMeta);
-	        		Collection<ItemStack> stack = new ArrayList<ItemStack>();
-	        		stack.add(letterpaper);
-					InboxesAccessor.GetInbox(uid).AddItems(stack);
+					this.plugin.getInboxesManager().getInbox(uid).addItem(letterpaper);
 					player.sendMessage(ChatColor.DARK_GREEN + "Textmail sent to "  + args[1] + ChatColor.RESET);
 					return true;
 				}
